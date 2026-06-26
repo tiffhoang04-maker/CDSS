@@ -1,0 +1,8 @@
+property,type,required,description,example
+identifier,string,yes,unique identifier for the condition,ExMCcondition:0
+name,string,yes,human-readable condition name,Pneumothorax
+is_roadmap,boolean,no,indicates whether the condition appears in the roadmap,true
+likelihood,float,no,likelihood associated with the condition,1.23
+notes,string,no,additional notes about the condition,"Can be severe"
+number_of_events,integer,no,number of associated events,3
+roadmap_url,string,no,link to the roadmap entry,https://humanresearchroadmap.nasa.gov

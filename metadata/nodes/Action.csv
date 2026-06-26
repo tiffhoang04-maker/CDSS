@@ -1,0 +1,2 @@
+property,type,description,example
+identifier,string, describes what to do in response to patient's health status, "Monitor patient for 24 hours"
