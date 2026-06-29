@@ -1,4 +1,4 @@
-property,type,required,description,example
+property,type,required?,description,example
 identifier,string,yes,unique identifier for the condition,ExMCcondition:0
 name,string,yes,human-readable condition name,Pneumothorax
 is_roadmap,boolean,no,indicates whether the condition appears in the roadmap,true
