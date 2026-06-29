@@ -1,0 +1,3 @@
+property,type,description,example
+from,string,Unique identifier of the source Condition,ExMCCondition:111
+to,string,Unique identifier of the target Disease Ontology corresponding to the condition,DOID:2030

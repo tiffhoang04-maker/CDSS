@@ -1,0 +1,4 @@
+property,type,description,example
+from,string,Unique identifier of the source MedKit item or onboard medical resource,ExMCmedkit:17
+to,string,Unique identifier of the target spaceflight-relevant health condition that the MedKit item may help treat or manage,ExMCcondition:142
+Original,string,Original source text describing the medical kit item or treatment capability linked to the condition,Intravascular volume replacement [such as intravenous (IV) fluids] and IV start & administration kit
