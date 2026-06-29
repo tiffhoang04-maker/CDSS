@@ -1,2 +1,3 @@
-property,type,description,example
-identifier,string,limitations of spaceflight environment in treating or diagnosing medical conditions,"We do not know the quantified health and mission outcomes due to medical events during exploration missions."
+property,type,required?,description,example
+identifier,string,yes,Unique identifier for the gap report,1.01
+name,string,yes,Human-readable name or title of the gap report,We do not know which emerging technologies are suitable for preflight medical screening for exploration missions.
