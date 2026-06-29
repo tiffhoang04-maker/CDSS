@@ -5,7 +5,7 @@ location,list<string>,no,List of locations where the medical kit item is stored,
 qty_in_pack,list<string>,no,List describing the quantity of the item included in each package or kit,["1"]
 route_of_use,list<string>,no,List of routes or methods by which the medical kit item is used or administered,["Topical"]
 side_effects,string,no,Known or possible side effects associated with use of the medical kit item,Skin irritation or allergic reaction
-strength_volume,list<string>,no,List describing the strength concentration dose amount or volume of the medical kit item,["2 %, 30 mL"]
+strength_volume,list<string>,no,List describing the strength concentration dose amount or volume of the medical kit item,"[2 %, 30 mL]"
 unit,list<string>,no,List of measurement units associated with the item quantity strength or volume,["tube"]
 comments,string,no,Additional notes instructions limitations or context for using the medical kit item,For temporary dental repair use only
 is_action,boolean,no,Indicates whether the medical kit item also represents an executable clinical action,false
