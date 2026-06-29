@@ -1,0 +1,3 @@
+property,type,description,example
+from,string, ,ExMCcondition:0
+to,string, ,1.01

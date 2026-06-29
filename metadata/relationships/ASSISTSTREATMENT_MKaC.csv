@@ -1,0 +1,4 @@
+property,type,description,example
+from,string,Unique identifier of the source MedKit item or resource,ExMCmedkit:44
+to,Unique identifer to the target condition being treated with assistance from the MedKit item,ExMCcondition:142
+Original,string,Original source term used to define the MedKit-to-Action relationship,Bandaging

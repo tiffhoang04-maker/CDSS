@@ -1,0 +1,3 @@
+property,type,description,example
+from,string,Unique identifier of the source MedKit node,ExMCmedkit:0
+to,string,Unique identifier of the target MedKit node included by the source MedKit node,ExMCmedkit:100

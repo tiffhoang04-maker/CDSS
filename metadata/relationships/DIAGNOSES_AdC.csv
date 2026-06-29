@@ -1,0 +1,5 @@
+property,type,description,example
+from,string,Unique identifier of the source Action node that diagnoses or supports assessment of a condition,ExMCaction:83
+to,string,Unique identifier of the target Condition node diagnosed or assessed by the action,ExMCcondition:0
+Original,string,Original source text or clinical capability used to define the diagnostic relationship,Vital signs measurement capability (blood pressure pulse respiratory rate pulse oximetry as required per the patient's clinical state)
+Addl_Info,string,Additional source context or qualification describing when or how the diagnostic action applies,required per the patient's clinical state
