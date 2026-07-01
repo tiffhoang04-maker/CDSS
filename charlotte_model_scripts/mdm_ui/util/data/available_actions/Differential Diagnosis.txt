@@ -1,0 +1,76 @@
+Run a blood electrolytes test.
+Use an Anal speculum to examine crew member.
+Collect a Sputum Culture.
+Use an Ophthalmoscope to examine crew member.
+Call tele-ophthalmology.
+Use a Slit lamp to examine crew member.
+Run a X-ray.
+Run a dental X-ray.
+Run a Doppler.
+Use a Nasal speculum to examine crew member.
+Use an Electrocardiograph (ECG) cardiac monitor.
+Collect a rapid influenza test culture.
+Run a blood hormones test.
+Collect a Blood Culture.
+Use an Intraocular Pressure (IOP) measurement device (Tono-Pen) to examine crew member.
+Use an Electrocardiogram (12-lead ECG) cardiac monitor.
+Run a Fundus camera.
+Use a Magnifying glass to examine crew member.
+Use a Peak flow pulmonary meter to examine crew member.
+Run a Microscope.
+Run an Intravenous Pyelography (IVP).
+Collect a drug susceptibility culture.
+Collect a Wound culture.
+Collect a rapid strep test culture.
+Use a Reflex hammer to examine crew member.
+Use a stethoscope to examine crew member.
+Collect a Bacterial identification culture.
+Use a Nerve conduction testing to examine crew member.
+Run a blood bone degradation markers test.
+Run an urography.
+Check results with microscopy.
+Use a Glasgow Coma Scale cue card to examine crew member.
+Use a Radiation dose analyzer to examine crew member.
+Run a physical examination.
+After taking a biopsy call telepathology.
+Run a Complete Blood Count (CBC) with differential test.
+Run an Echocardiogram.
+Use an Otoscope to examine crew member.
+Run a Computed Tomography (CT) myelography.
+Run a Complete Blood Count (CBC) test.
+Use an Invasive blood pressure monitor to examine crew member.
+Use a Non-Invasive ICP measurement to examine crew member.
+Collect a gram stains culture.
+Run a camera.
+Collect a staining technique culture.
+Check the vehicle's Carbon dioxide monitor.
+Take a core biopsy.
+Collect a Polymerase Chain Reaction (PCR) methodology culture.
+Use a Tissue pressure sensor to examine crew member.
+Run a Computed Tomography (CT).
+Run a blood chemistries test.
+Run an Ultrasound.
+Run a blood creatinine test.
+Run a Dual-Energy X-ray Absorptiometry (DEXA) scan.
+Run a chest X-Ray.
+Use muscle strength monitor.
+Use an Electromyogram (EMG) to examine crew member.
+Collect a Discharge culture.
+Take an excisional biopsy.
+Run a blood cardiac enzymes test.
+Collect a throat culture.
+Use a Visual acuity charts to examine crew member.
+Collect an Urine Culture.
+Run a urine analysis with urine test strips.
+Run a bone scan.
+Run a blood gases test.
+Run a blood hemoglobin test.
+Run a Magnetic Resonance Imaging (MRI).
+Take a fine needle aspiration (FNA) biopsy.
+Use an Intracranial pressure monitor to examine crew member.
+Collect an Organism identification culture.
+Collect a Cerebrospinal Fluid (CSF) Culture.
+Run an Electroencephalograph (EEG) monitor.
+Use a pH Strips to examine crew member.
+Use a Tongue depressor to examine crew member.
+Collect a Skin culture.
