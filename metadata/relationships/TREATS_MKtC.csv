@@ -2,3 +2,5 @@ property,type,required?,description,example
 from,string,N/A,Unique identifier of the source MedKit item or onboard medical resource,ExMCmedkit:17
 to,string,N/A,Unique identifier of the target spaceflight-relevant health condition that the MedKit item may help treat or manage,ExMCcondition:142
 Original,string,yes,Original source text describing the medical kit item or treatment capability linked to the condition,Intravascular volume replacement [such as intravenous (IV) fluids] and IV start & administration kit
+Addl_info,string,no,Additional information about the relationship between the MedKit item and the health condition,This treatment is used to manage dehydration and hypovolemia in astronauts during spaceflight.
+route_info,string,no,Information about the route of administration or application of the MedKit item for the health condition,IV fluids are administered intravenously to restore fluid balance and maintain blood pressure.
