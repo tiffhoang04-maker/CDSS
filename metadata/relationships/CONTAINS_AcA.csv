@@ -1,4 +1,4 @@
-property,type,description,example
-from,string,Unique identifier of the source Action node that contains or groups another Action node,ExMCaction:78
-to,string,Unique identifier of the targect Action node contained or grouped under the source Action node,ExMCaction:83
-action_priority,integer,Priority value assigned to the target action within this Action-to-Action relationship,1
+property,type,required?,description,example
+from,string,N/A,Unique identifier of the source Action node that contains or groups another Action node,ExMCaction:78
+to,string,N/A,Unique identifier of the targect Action node contained or grouped under the source Action node,ExMCaction:83
+action_priority,integer,no,Priority value assigned to the target action within this Action-to-Action relationship,1

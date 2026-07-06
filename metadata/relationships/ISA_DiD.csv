@@ -1,3 +1,3 @@
-property,type,description,example
-from,string,Unique identifier of the source Disease node that's a subtype or more specific disease,DOID:8463
-to,string,Unique identifier of the target Disease node representing the broader parent disease category,DOID4677
+property,type,required?,description,example
+from,string,N/A,Unique identifier of the source Disease node that's a subtype or more specific disease,DOID:8463
+to,string,N/A,Unique identifier of the target Disease node representing the broader parent disease category,DOID4677

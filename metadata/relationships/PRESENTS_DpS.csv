@@ -1,3 +1,3 @@
-property,type,description,example
-from,string,Unique identifier of the source Disease node,DOID:8337
-to,string,Unique identifier of the target symptom that may present as part of the disease,D00006
+property,type,required?,description,example
+from,string,N/A,Unique identifier of the source Disease node,DOID:8337
+to,string,N/A,Unique identifier of the target symptom that may present as part of the disease,D00006

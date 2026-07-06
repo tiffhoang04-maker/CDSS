@@ -1,3 +1,3 @@
-property,type,description,example
-from,string,Unique identifier of the source Disease node that resembles another disease,DOID:1949
-to,string,Unique identifier of the target Disease node that shares similar clinical features with the source disease,DOID:2607
+property,type,required?,description,example
+from,string,N/A,Unique identifier of the source Disease node that resembles another disease,DOID:1949
+to,string,N/A,Unique identifier of the target Disease node that shares similar clinical features with the source disease,DOID:2607

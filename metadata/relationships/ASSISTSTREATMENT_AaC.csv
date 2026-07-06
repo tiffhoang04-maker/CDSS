@@ -1,4 +1,4 @@
-property,type,description,example
-from,string,Unique identifier of the source action node that assists treatment of a condition,ExMCaction:121
-to,string,Unique identifer to the target condition being treated with assistance of the action,ExMCcondition:138
-Original,string,Original source term used to define or support the treatment-assistance relationship,Tele-ophthalmology
+property,type,required?,description,example
+from,string,N/A,Unique identifier of the source action node that assists treatment of a condition,ExMCaction:121
+to,string,N/A,Unique identifier of the target condition being treated with assistance of the action,ExMCcondition:138
+Original,string,yes,Original source term used to define or support the treatment-assistance relationship,Tele-ophthalmology

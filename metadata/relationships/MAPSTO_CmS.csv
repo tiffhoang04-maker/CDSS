@@ -1,3 +1,3 @@
-property,type,description,example
-from,string,Unique identifier of the source Condition,ExMCcondition:110
-to,string,Unique identifier of the target Symptom node corresponding to or associated with the Condition,D009325
+property,type,required?,description,example
+from,string,N/A,Unique identifier of the source Condition,ExMCcondition:110
+to,string,N/A,Unique identifier of the target Symptom node corresponding to or associated with the Condition,D009325
