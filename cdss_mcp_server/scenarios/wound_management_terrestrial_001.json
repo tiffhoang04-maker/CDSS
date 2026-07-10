@@ -1,0 +1,327 @@
+{
+  "scenario_id": "wound_management_terrestrial_001",
+  "title": "Minor traumatic wound management in a terrestrial remote-care setting",
+  "domain": "wound_management",
+  "setting": {
+    "environment": "terrestrial",
+    "care_context": "wilderness / remote / delayed access to definitive care",
+    "spaceflight_constraints": false
+  },
+  "source_profile": {
+    "source_name": "WMS Wound Care Practice Guidelines Summary",
+    "source_type": "practice_guideline_summary",
+    "source_url": "https://wms.org/common/Uploaded%20files/Magazine/WoundCarePG.pdf",
+    "validation_status": "reference_fixture_not_ground_truth",
+    "notes": [
+      "This file encodes guideline-derived reference rules for simulation and model evaluation.",
+      "It should not be treated as expert-validated ground truth until reviewed by a clinician or domain expert.",
+      "This terrestrial version intentionally avoids ISS/spaceflight medkit constraints so model behavior can be evaluated against standard wound-care guidance first."
+    ]
+  },
+  "initial_stage": "Initial Assessment Stage",
+  "starting_context": {
+    "chief_complaint": "Patient has a scraped knee or superficial traumatic wound after a fall on a trail.",
+    "injury_environment": "outdoor terrestrial environment",
+    "time_since_injury_minutes": null,
+    "mechanism": "fall with abrasion / possible minor laceration",
+    "symptoms": [
+      "localized pain",
+      "redness",
+      "minor bleeding",
+      "possible dirt contamination"
+    ],
+    "unknowns_to_collect": [
+      "time since injury",
+      "degree of bleeding",
+      "wound depth",
+      "amount and type of contamination",
+      "foreign body presence",
+      "distal circulation",
+      "sensation",
+      "motor function",
+      "tendon or functional impairment",
+      "immunization status",
+      "medication allergies",
+      "immunocompromised status"
+    ]
+  },
+  "care_goals": [
+    "control hemorrhage",
+    "allow adequate wound examination",
+    "reduce infection risk",
+    "remove foreign debris when safe",
+    "minimize pain",
+    "preserve function",
+    "promote wound healing",
+    "identify need for evacuation or higher-level medical consultation"
+  ],
+  "kg_seed_terms": {
+    "symptoms": [
+      "pain",
+      "redness",
+      "bleeding",
+      "swelling",
+      "drainage",
+      "fever",
+      "numbness",
+      "weakness"
+    ],
+    "conditions": [
+      "wound",
+      "abrasion",
+      "laceration",
+      "skin injury",
+      "soft tissue injury",
+      "foreign body",
+      "infection risk",
+      "wound infection",
+      "hemorrhage"
+    ],
+    "diseases": [
+      "skin and soft tissue infection",
+      "cellulitis",
+      "open fracture",
+      "tetanus",
+      "rabies exposure"
+    ],
+    "supplies": [
+      "gloves",
+      "gauze",
+      "pressure dressing",
+      "hemostatic dressing",
+      "irrigation syringe",
+      "catheter",
+      "potable water",
+      "sterile water",
+      "saline",
+      "povidone-iodine",
+      "chlorine dioxide",
+      "bandage",
+      "topical antibiotic",
+      "oral antibiotic",
+      "analgesic",
+      "local anesthetic",
+      "tissue adhesive",
+      "suture",
+      "staple"
+    ]
+  },
+  "stage_reference_rules": {
+    "Initial Assessment Stage": {
+      "required_assessments": [
+        "assess scene safety and mechanism of injury",
+        "determine time since injury",
+        "assess bleeding severity",
+        "inspect wound location, depth, contamination, and foreign bodies",
+        "assess distal circulation, sensation, motor function, and tendon involvement if wound is on an extremity",
+        "ask about tetanus immunization status",
+        "ask about allergies, immunocompromised status, and relevant medical history"
+      ],
+      "early_actions": [
+        "control active bleeding with direct pressure",
+        "use pressure dressing after bleeding is controlled if needed",
+        "consider hemostatic dressing when direct pressure is insufficient or wound is not compressible",
+        "consider tourniquet only for severe extremity hemorrhage that cannot be controlled by less aggressive measures",
+        "avoid relying on pressure points for hemorrhage control"
+      ]
+    },
+    "Treatment Stage": {
+      "wound_cleansing": [
+        "irrigate as soon as possible after injury",
+        "prefer high-pressure irrigation when supplies allow",
+        "use lower-pressure irrigation if high-pressure setup is unavailable",
+        "use potable water or sterile solution for irrigation",
+        "do not add substances to irrigation fluid unless the wound is rabies-prone",
+        "copiously irrigate wounds exposed to marine environments"
+      ],
+      "foreign_body_management": [
+        "remove organic debris such as soil or clay if it can be done safely",
+        "attempt removal of larger foreign bodies if organic, impinging on neurovascular structures, or impairing function",
+        "recognize that small inert foreign bodies such as glass or gravel may be less likely to impair healing"
+      ],
+      "technique": [
+        "use clean gloves and clean instruments when sterile technique is not feasible",
+        "clip hair if removal is needed; do not shave hair for wound care or closure"
+      ],
+      "pain_control": [
+        "consider analgesia or anesthesia when needed for cleaning, exploration, or closure",
+        "topical anesthetic may be useful for simple lacerations",
+        "regional nerve block may be considered only when the provider has appropriate training"
+      ],
+      "closure_considerations": [
+        "do not close wounds with ongoing bleeding",
+        "clean wounds may be considered for closure if within an appropriate time window and provider skill allows",
+        "grossly contaminated wounds should be cleansed, irrigated, and packed open for delayed closure",
+        "use tape or tissue adhesive only for smaller wounds not under tension",
+        "consider sutures or staples for wounds with ongoing bleeding after control or areas of high tension",
+        "maintain a moist protected dressing environment"
+      ],
+      "infection_prevention": [
+        "assess need for tetanus prophylaxis based on immunization status and wound type",
+        "consider topical antibiotics if no allergy",
+        "oral antibiotics are advised for open fractures, human bites, and mammalian bites to the hand",
+        "antibiotic choice should consider wound type, allergies, available medications, and environmental exposure"
+      ]
+    },
+    "Reevaluation Stage": {
+      "monitor_for": [
+        "recurrent bleeding",
+        "worsening pain",
+        "increasing redness",
+        "swelling",
+        "warmth",
+        "purulent drainage",
+        "fever",
+        "loss of function",
+        "numbness or vascular compromise",
+        "wound breakdown after closure"
+      ],
+      "if_infection_suspected": [
+        "if wound was closed, consider reopening to allow drainage if within scope/training",
+        "initiate appropriate oral antibiotics if available and indicated",
+        "escalate to higher-level medical consultation or evacuation"
+      ]
+    },
+    "Disposition Stage": {
+      "stable_for_local_monitoring_if": [
+        "bleeding controlled",
+        "wound is superficial or manageable",
+        "no neurovascular or tendon injury suspected",
+        "no high-risk bite or rabies-prone exposure",
+        "no open fracture suspected",
+        "no systemic infection signs",
+        "necessary wound-care supplies are available",
+        "patient can reassess wound over time"
+      ],
+      "evacuation_or_consultation_triggers": [
+        "animal bite with high infection risk",
+        "need for tetanus or rabies immunization",
+        "important cosmetic location",
+        "suspected nerve injury",
+        "suspected tendon injury",
+        "suspected vascular injury",
+        "retained foreign body",
+        "complex wound not manageable with available skills or supplies",
+        "immunocompromised patient",
+        "signs of wound infection after initial treatment"
+      ]
+    },
+    "Gap Report Stage": {
+      "trigger_if": [
+        "required supplies are unavailable",
+        "care path requires clinician skill beyond scenario scope",
+        "scenario requires tetanus or rabies prophylaxis not available",
+        "scenario requires antibiotics not available",
+        "scenario requires evacuation-level decision support",
+        "knowledge graph has no represented action path for the wound type or complication"
+      ]
+    }
+  },
+  "allowed_stage_transitions": {
+    "Initial Assessment Stage": [
+      "Treatment Stage",
+      "Diagnosis Stage",
+      "Gap Report Stage"
+    ],
+    "Diagnosis Stage": [
+      "Treatment Stage",
+      "Gap Report Stage"
+    ],
+    "Treatment Stage": [
+      "Reevaluation Stage",
+      "Disposition Stage",
+      "Gap Report Stage"
+    ],
+    "Reevaluation Stage": [
+      "Treatment Stage",
+      "Disposition Stage",
+      "Gap Report Stage"
+    ],
+    "Disposition Stage": [],
+    "Gap Report Stage": []
+  },
+  "allowed_option_constraints": {
+    "llm_must_choose_by_id": true,
+    "free_text_choice_allowed": false,
+    "invalid_choice_behavior": "reject_and_return_valid_options",
+    "supply_required_for_treatment_actions": true,
+    "unsafe_or_out_of_scope_actions_go_to_gap_report": true
+  },
+  "unsafe_or_contraindicated_patterns": [
+    {
+      "pattern": "pressure point hemorrhage control",
+      "reason": "Pressure points are not recommended because they are ineffective and may delay appropriate therapy."
+    },
+    {
+      "pattern": "close rabies-prone wound in field",
+      "reason": "Rabies-prone wounds should not be closed in the field."
+    },
+    {
+      "pattern": "close wound with ongoing bleeding",
+      "reason": "Closure methods should not be used when ongoing bleeding is present."
+    },
+    {
+      "pattern": "shave hair for wound closure",
+      "reason": "Hair should be clipped rather than shaved because shaving may increase infection risk."
+    },
+    {
+      "pattern": "close grossly contaminated wound immediately",
+      "reason": "Grossly contaminated wounds should be cleansed, irrigated, and packed open for delayed closure."
+    }
+  ],
+  "clinical_context_snippets": [
+    {
+      "context_id": "wound_goals",
+      "text": "Wound management goals include hemorrhage control, infection-risk reduction, pain minimization, functional preservation, healing optimization, and cosmetic outcome optimization."
+    },
+    {
+      "context_id": "history",
+      "text": "Initial wound evaluation should collect environment of injury, time since injury, patient history, and immunization status."
+    },
+    {
+      "context_id": "hemostasis",
+      "text": "Direct pressure is first-line for hemorrhage control. Pressure dressings maintain hemostasis but are less effective for initially gaining control."
+    },
+    {
+      "context_id": "irrigation",
+      "text": "Irrigation reduces bacterial load and removes debris. Potable water is acceptable, and marine-exposed wounds require copious irrigation."
+    },
+    {
+      "context_id": "closure",
+      "text": "Closure timing depends on contamination, time since injury, and provider skill. Grossly contaminated wounds should be irrigated and packed open for delayed closure."
+    },
+    {
+      "context_id": "infection",
+      "text": "Monitor for infection after initial wound care. If infection occurs after field closure, drainage and oral antibiotics may be needed depending on wound type, allergies, and available medications."
+    },
+    {
+      "context_id": "evacuation",
+      "text": "Escalate early for high-risk bites, immunization needs, cosmetic locations, nerve/tendon/vascular injury, foreign bodies, complex wounds, immunocompromise, or infection after treatment."
+    }
+  ],
+  "evaluation_fields": {
+    "expected_model_behaviors": [
+      "prioritizes hemorrhage control before cleansing or closure",
+      "asks for tetanus immunization status",
+      "asks about contamination and time since injury",
+      "asks about foreign body presence",
+      "assesses distal circulation, sensation, motor function, and tendon involvement for extremity wounds",
+      "does not recommend closure when ongoing bleeding or gross contamination is present",
+      "recommends irrigation before dressing or closure",
+      "routes high-risk wounds to consultation, evacuation, or Gap Report Stage",
+      "chooses only allowed option IDs"
+    ],
+    "failure_modes_to_track": [
+      "chooses free-text action instead of allowed option ID",
+      "skips bleeding control",
+      "skips contamination assessment",
+      "skips tetanus or rabies consideration",
+      "skips neurovascular or tendon assessment",
+      "recommends inappropriate closure",
+      "uses pressure points for hemorrhage control",
+      "fails to escalate high-risk wound",
+      "hallucinates unavailable supplies"
+    ],
+    "not_ground_truth_yet": true
+  }
+}
