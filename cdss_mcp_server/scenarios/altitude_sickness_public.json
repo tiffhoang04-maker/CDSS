@@ -1,0 +1,135 @@
+{
+  "scenario_id": "altitude_sickness_public",
+  "title": "Illness Following Rapid Ascent",
+  "domain": "high_altitude_remote_care",
+  "setting": {
+    "environment": "remote terrestrial high-altitude expedition",
+    "location": "Tibetan highlands",
+    "care_context": "delayed evacuation and limited oxygen"
+  },
+  "source_profile": {
+    "source_type": "de-identified_adaptation_of_published_case_report",
+    "validation_status": "simulation_fixture_not_clinical_ground_truth",
+    "notes": "Source identity, observed treatment, outcomes, and scoring criteria are intentionally withheld from the model."
+  },
+  "initial_stage": "Initial Assessment Stage",
+  "medkit_option_ids": [
+    "ExMCmedkit:178",
+    "ExMCmedkit:273",
+    "ExMCmedkit:259"
+  ],
+  "starting_context": {
+    "patient_profile": {
+      "age_years": 47,
+      "sex": "male",
+      "smoking_status": "non-smoker",
+      "experience": "experienced mountaineer",
+      "prior_high_altitude_exposure": "No prior exposure above 4000 m",
+      "relevant_history": "No additional medical history reported"
+    },
+    "environment": {
+      "initial_altitude_m": 1500,
+      "first_acclimatization_altitude_m": 2930,
+      "nights_at_2930_m": 2,
+      "current_altitude_m": 4800,
+      "ascent_pattern": "Rapid ascent by vehicle"
+    },
+    "history_of_present_illness": [
+      "The patient developed headache and malaise during continued ascent after two nights at 2930 m.",
+      "He did not report his symptoms and continued ascending.",
+      "At 4800 m, the headache worsened.",
+      "He self-administered paracetamol 500 mg three times daily.",
+      "The next morning he had severe headache, faintness, moderate light-headedness, impaired coordination, and ataxia.",
+      "Sleep during the previous night was extremely fragmented."
+    ],
+    "initial_observations": {
+      "heart_rate_bpm": 110,
+      "spo2_percent_at_rest": 58,
+      "lake_louise_score": 6,
+      "lung_auscultation": "Crackles and bubbling sounds",
+      "neurologic_findings": [
+        "Impaired coordination",
+        "Ataxia",
+        "Light-headedness"
+      ],
+      "reported_symptoms": [
+        "Severe headache",
+        "Faintness",
+        "Moderate light-headedness",
+        "Poor sleep"
+      ]
+    },
+    "operational_constraints": [
+      "Oxygen supply is restricted.",
+      "Expedition vehicles are currently unavailable because of mechanical failure.",
+      "The environment is remote and definitive care is unavailable on site."
+    ],
+    "medication_inventory_source": "Use the Neo4j-backed valid treatment options for available medications.",
+    "available_resources": [
+      {
+        "resource_id": "ALT-R-004",
+        "name": "Supplemental oxygen",
+        "availability": "limited"
+      },
+      {
+        "resource_id": "ALT-R-005",
+        "name": "Pulse oximeter",
+        "availability": "available"
+      },
+      {
+        "resource_id": "ALT-R-006",
+        "name": "Immediate evacuation transport",
+        "availability": "unavailable"
+      },
+      {
+        "resource_id": "ALT-R-007",
+        "name": "Portable hyperbaric chamber",
+        "availability": "not reported"
+      }
+    ]
+  },
+  "kg_seed_terms": {
+    "symptoms": [
+      "headache",
+      "faintness",
+      "light-headedness",
+      "ataxia",
+      "impaired coordination",
+      "sleep disturbance",
+      "crackles",
+      "bubbling breath sounds",
+      "hypoxemia"
+    ],
+    "conditions": [
+      "hypoxia",
+      "rapid ascent"
+    ],
+    "diseases": []
+  },
+  "clinical_context_snippets": [
+    "Recent rapid ascent was followed by headache, neurologic symptoms, severe resting hypoxemia, and abnormal lung sounds.",
+    "The environment has limited oxygen and currently unavailable evacuation transport.",
+    "Recommendations should account for available resources and explicitly identify missing capabilities."
+  ],
+  "allowed_stage_transitions": {
+    "Initial Assessment Stage": [
+      "Diagnosis Stage"
+    ],
+    "Diagnosis Stage": [
+      "Treatment Stage"
+    ],
+    "Treatment Stage": [
+      "Reevaluation Stage"
+    ],
+    "Reevaluation Stage": [
+      "Treatment Stage",
+      "Evacuation Stage",
+      "Resolution Stage"
+    ],
+    "Evacuation Stage": [
+      "Reevaluation Stage",
+      "Resolution Stage"
+    ],
+    "Resolution Stage": []
+  }
+}

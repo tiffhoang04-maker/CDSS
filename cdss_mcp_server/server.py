@@ -1,4 +1,8 @@
 # here's the actiual MCP server with four tools (detailed below)
+
+# edit 7/14: the goal is to
+# Automatically retrieve everything already available, explicitly identify what is missing, and ask the clinician only for information that is both obtainable and decision-relevant.
+
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
@@ -16,8 +20,8 @@ mcp = FastMCP("CDSS MCP Server")
 neo4j_client = Neo4jClient()
 
 
-def _get_valid_options_internal(patient_id: str = "current_patient") -> dict[str, Any]:
-    state = read_patient_state(patient_id)
+def _get_valid_options_internal() -> dict[str, Any]:
+    state = read_patient_state("current_patient")
     scenario = read_scenario(state["scenario_id"])
 
     current_stage = state["current_stage"]
@@ -29,7 +33,11 @@ def _get_valid_options_internal(patient_id: str = "current_patient") -> dict[str
         + kg_seed_terms.get("diseases", [])
     )
 
-    raw_actions = neo4j_client.get_stage_actions(current_stage, action_filter_terms)
+    raw_actions = neo4j_client.get_stage_actions(
+        current_stage,
+        action_filter_terms,
+        scenario.get("medkit_option_ids")
+    )
 
     valid_actions = []
     for action in raw_actions:
@@ -43,6 +51,10 @@ def _get_valid_options_internal(patient_id: str = "current_patient") -> dict[str
             "label": action.get("label"),
             "name": action.get("name"),
             "phrase": action.get("phrase"),
+            "route_of_use": action.get("route_of_use"),
+            "strength_volume": action.get("strength_volume"),
+            "location": action.get("location"),
+            "qty_in_pack": action.get("qty_in_pack"),
             "node_labels": action.get("node_labels"),
             "source": "neo4j"
         })
@@ -66,13 +78,13 @@ def _get_valid_options_internal(patient_id: str = "current_patient") -> dict[str
 
 @mcp.tool() # tool 1
 # this is a simplified replacement for MedicalInformation / medical_info_cache from charlotte's app
-def get_current_patient_state(patient_id: str = "current_patient") -> dict[str, Any]:
+def get_current_patient_state() -> dict[str, Any]:
     """
     Read the current patient state from the local patient record.
 
     Use this before choosing actions or stages. This tool does not modify state.
     """
-    state = read_patient_state(patient_id)
+    state = read_patient_state("current_patient")
     scenario = read_scenario(state["scenario_id"])
 
     return {
@@ -86,16 +98,108 @@ def get_current_patient_state(patient_id: str = "current_patient") -> dict[str, 
         }
     }
 
+# new tool added with the intention of prompting users if necessary info is mjissing
+@mcp.tool()
+def assess_information_gaps() -> dict[str, Any]:
+    """
+    Identify missing patient information and return structured prompts
+    or measurement requests.
+
+    Universal emergency assessment fields are checked first, followed
+    by scenario-specific and differential-specific requirements.
+    """
+    state = read_patient_state("current_patient")
+    scenario = read_scenario(state["scenario_id"])
+
+    clinical_data = state.get("clinical_data", {})
+
+    requirements = list(DEFAULT_INITIAL_ASSESSMENT_REQUIREMENTS)
+    requirements.extend(
+        scenario.get("information_requirements", [])
+    )
+
+    requirements_by_id = {
+        requirement["field_id"]: requirement
+        for requirement in requirements
+    }
+
+    missing_information = []
+
+    for field_id, requirement in requirements_by_id.items():
+        current_value = clinical_data.get(field_id)
+
+        missing = (
+            current_value is None
+            or current_value.get("status") in {
+                "unknown",
+                "not_recorded",
+                "stale"
+            }
+        )
+
+        if not missing:
+            continue
+
+        missing_information.append({
+            "field_id": field_id,
+            "display_name": requirement.get("display_name"),
+            "category": requirement.get("category"),
+            "priority": requirement.get("priority", "routine"),
+            "blocking": requirement.get("blocking", False),
+            "acquisition_method": requirement.get(
+                "acquisition_method",
+                "ask_user"
+            ),
+            "prompt": requirement.get("prompt"),
+            "reason": requirement.get("reason")
+        })
+
+    priority_order = {
+        "critical": 0,
+        "high": 1,
+        "routine": 2
+    }
+
+    missing_information.sort(
+        key=lambda item: priority_order.get(
+            item["priority"],
+            3
+        )
+    )
+
+    blocking_fields = [
+        item for item in missing_information
+        if item["blocking"]
+    ]
+
+    return {
+        "patient_id": state.get("patient_id"),
+        "current_stage": state.get("current_stage"),
+        "record_status": (
+            "blank"
+            if not clinical_data
+            else "partially_complete"
+        ),
+        "missing_information": missing_information,
+        "next_acquisition_requests": missing_information[:3],
+        "can_proceed_with_full_assessment": len(blocking_fields) == 0,
+        "instructions": {
+            "do_not_repeat_known_questions": True,
+            "prioritize_immediate_threats": True,
+            "request_measurement_when_value_is_missing": True,
+            "do_not_assume_missing_values_are_normal": True
+        }
+    }
 
 @mcp.tool() # tool 2
 # MCP version of charlotte's action_list_dict + return_action_lists
-def get_valid_options(patient_id: str = "current_patient") -> dict[str, Any]:
+def get_valid_options() -> dict[str, Any]:
     """
     Return the valid action IDs and valid next stage IDs for the current patient stage.
 
     The LLM should choose only from these returned IDs/stage names.
     """
-    return _get_valid_options_internal(patient_id)
+    return _get_valid_options_internal()
 
 
 @mcp.tool() # tool 3
@@ -104,8 +208,7 @@ def get_valid_options(patient_id: str = "current_patient") -> dict[str, Any]:
 # the server must reject anything outside the valid list
 def submit_choice(
     choice_type: str,
-    choice_id: str,
-    patient_id: str = "current_patient"
+    choice_id: str
 ) -> dict[str, Any]:
     """
     Validate and apply a model-selected option.
@@ -116,7 +219,7 @@ def submit_choice(
 
     Invalid choices are rejected and the valid options are returned.
     """
-    valid_options = _get_valid_options_internal(patient_id)
+    valid_options = _get_valid_options_internal()
 
     if choice_type == "action":
         allowed_actions = {
@@ -139,7 +242,7 @@ def submit_choice(
         updated_state = add_completed_action(
             choice_id=choice_id,
             choice_label=chosen_action.get("label"),
-            patient_id=patient_id
+            patient_id="current_patient"
         )
 
         return {
@@ -148,7 +251,7 @@ def submit_choice(
             "choice_id": choice_id,
             "choice_label": chosen_action.get("label"),
             "updated_patient_state": updated_state,
-            "next_valid_options": _get_valid_options_internal(patient_id)
+            "next_valid_options": _get_valid_options_internal()
         }
 
     if choice_type == "stage":
@@ -167,7 +270,7 @@ def submit_choice(
 
         updated_state = update_stage(
             new_stage=choice_id,
-            patient_id=patient_id
+            patient_id="current_patient"
         )
 
         return {
@@ -175,7 +278,7 @@ def submit_choice(
             "choice_type": "stage",
             "choice_id": choice_id,
             "updated_patient_state": updated_state,
-            "next_valid_options": _get_valid_options_internal(patient_id)
+            "next_valid_options": _get_valid_options_internal()
         }
 
     return {
@@ -192,7 +295,6 @@ def submit_choice(
 @mcp.tool() # tool 4
 #simplified read-only vers of get_kg_context.py 
 def get_kg_context_for_patient(
-    patient_id: str = "current_patient",
     limit: int = 50
 ) -> dict[str, Any]:
     """
@@ -200,7 +302,7 @@ def get_kg_context_for_patient(
 
     This is read-only. It does not choose actions or update state.
     """
-    state = read_patient_state(patient_id)
+    state = read_patient_state("current_patient")
     scenario = read_scenario(state["scenario_id"])
 
     seed_terms = scenario.get("kg_seed_terms", {})
@@ -228,4 +330,4 @@ def get_kg_context_for_patient(
 
 if __name__ == "__main__":
     print("Starting CDSS MCP Server...", flush = True)
-    mcp.run()
+    mcp.run(transport="stdio")

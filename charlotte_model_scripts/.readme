@@ -1,0 +1,6 @@
+Heads up, this is just the scripts pertaining to Charlotte's
+app and how it queries a knowledge graph by connecting to neo4j desktop
+
+This folder does NOT contain other files such as the "canned scenario" (Pneumothorax) used to evaluate model performance and showcase during Charlotte's demo.
+
+The requirements.txt file in this folder was something Tiffany Hoang created while trying to figue out the various dependencies and modules that Charlotte used... Tiffany is unsure if it's complete but it seems to have enough that the models will run + Streamlit should launch.

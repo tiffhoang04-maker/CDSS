@@ -43,7 +43,8 @@ class Neo4jClient:
     def get_stage_actions(
         self,
         stage: str,
-        terms: list[str] | None = None
+        terms: list[str] | None = None,
+        medkit_option_ids: list[str] | None = None
     ) -> list[dict[str, Any]]:
         """
         Return valid KG action options for a stage.
@@ -103,7 +104,14 @@ class Neo4jClient:
 
         if stage == "Treatment Stage":
             query = """
-            MATCH (:Condition)-[:TREATS_MKtC]-(m:MedKit)
+            MATCH (m:MedKit)
+            WHERE (
+              size($medkit_option_ids) > 0
+              AND m.identifier IN $medkit_option_ids
+            ) OR (
+              size($medkit_option_ids) = 0
+              AND EXISTS { MATCH (:Condition)-[:TREATS_MKtC]-(m) }
+            )
             RETURN DISTINCT
               coalesce(m.identifier, elementId(m)) AS option_id,
               m.name AS label,
@@ -111,10 +119,14 @@ class Neo4jClient:
               m.route_of_use AS route_of_use,
               m.strength_volume AS strength_volume,
               m.location AS location,
+              m.qty_in_pack AS qty_in_pack,
               labels(m) AS node_labels
             ORDER BY label
             """
-            return self.run_query(query)
+            return self.run_query(
+                query,
+                {"medkit_option_ids": medkit_option_ids or []}
+            )
 
         return []
 

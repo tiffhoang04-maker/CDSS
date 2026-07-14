@@ -1,15 +1,11 @@
 {
   "patient_id": "crew_member_001",
-  "scenario_id": "wound_management_terrestrial_001",
+  "scenario_id": "altitude_sickness_public",
   "current_stage": "Initial Assessment Stage",
-  "completed_action_ids": [
-    "ExMCaction:83"
-  ],
+  "completed_action_ids": [],
   "current_diagnosis_ids": [],
   "elapsed_time": 0,
   "notes": [],
   "status": "active",
-  "completed_action_labels": [
-    "Run vitals to check blood pressure."
-  ]
+  "completed_action_labels": []
 }
