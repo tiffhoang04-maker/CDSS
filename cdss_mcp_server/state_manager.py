@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -72,3 +73,81 @@ def update_stage(
     state = read_patient_state(patient_id)
     state["current_stage"] = new_stage
     return write_patient_state(state, patient_id)
+
+
+def record_clinical_observation(
+    field_id: str,
+    value: str,
+    unit: str = "",
+    status: str = "known",
+    source: str = "user",
+    patient_id: str = "current_patient"
+) -> dict[str, Any]:
+    state = read_patient_state(patient_id)
+    observation = {
+        "value": value,
+        "status": status,
+        "source": source,
+        "recorded_at": datetime.now(timezone.utc).isoformat()
+    }
+    if unit:
+        observation["unit"] = unit
+
+    state.setdefault("clinical_data", {})[field_id] = observation
+    write_patient_state(state, patient_id)
+    return observation
+
+
+def record_patient_test_result(
+    test_id: str,
+    result: str,
+    field_id: str,
+    unit: str = "",
+    status: str = "known",
+    source: str = "user",
+    patient_id: str = "current_patient"
+) -> dict[str, Any]:
+    state = read_patient_state(patient_id)
+    test_result = {
+        "test_id": test_id,
+        "field_id": field_id,
+        "result": result,
+        "status": status,
+        "source": source,
+        "recorded_at": datetime.now(timezone.utc).isoformat()
+    }
+    if unit:
+        test_result["unit"] = unit
+
+    state.setdefault("test_results", {})[test_id] = test_result
+    state.setdefault("clinical_data", {})[field_id] = {
+        "value": result,
+        "status": status,
+        "source": f"test:{test_id}",
+        "recorded_at": test_result["recorded_at"],
+        **({"unit": unit} if unit else {})
+    }
+    write_patient_state(state, patient_id)
+    return test_result
+
+
+def record_patient_diagnosis(
+    diagnosis_id: str,
+    diagnosis_name: str,
+    evidence_summary: str = "",
+    patient_id: str = "current_patient"
+) -> dict[str, Any]:
+    state = read_patient_state(patient_id)
+    diagnosis = {
+        "diagnosis_id": diagnosis_id,
+        "diagnosis_name": diagnosis_name,
+        "evidence_summary": evidence_summary,
+        "selected_at": datetime.now(timezone.utc).isoformat(),
+        "status": "working_diagnosis"
+    }
+    state.setdefault("current_diagnosis_ids", [])
+    if diagnosis_id not in state["current_diagnosis_ids"]:
+        state["current_diagnosis_ids"].append(diagnosis_id)
+    state.setdefault("diagnoses", {})[diagnosis_id] = diagnosis
+    write_patient_state(state, patient_id)
+    return diagnosis

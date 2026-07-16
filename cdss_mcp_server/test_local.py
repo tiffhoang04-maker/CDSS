@@ -1,4 +1,4 @@
-# for purposes of testing server.py
+# for purposes of testing server.py; i don't use this file much anymore.
 from server import (
     get_current_patient_state,
     get_valid_options,

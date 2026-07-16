@@ -1,11 +1,28 @@
 {
   "patient_id": "crew_member_001",
   "scenario_id": "altitude_sickness_public",
-  "current_stage": "Initial Assessment Stage",
-  "completed_action_ids": [],
-  "current_diagnosis_ids": [],
+  "current_stage": "Diagnosis Stage",
+  "completed_action_ids": [
+    "ExMCaction:102",
+    "ExMCaction:82"
+  ],
+  "current_diagnosis_ids": [
+    "ExMCcondition:90"
+  ],
   "elapsed_time": 0,
   "notes": [],
   "status": "active",
-  "completed_action_labels": []
+  "completed_action_labels": [
+    "Run vitals to check oxygen saturation.",
+    "Run a blood gases test."
+  ],
+  "diagnoses": {
+    "ExMCcondition:90": {
+      "diagnosis_id": "ExMCcondition:90",
+      "diagnosis_name": "Altitude Sickness",
+      "evidence_summary": "Patient at altitude 4800m with headache, ataxia, hypoxia (SpO2 58%), rapid ascent, and acute symptoms typical of altitude sickness.",
+      "selected_at": "2026-07-16T18:35:58.506911+00:00",
+      "status": "working_diagnosis"
+    }
+  }
 }
