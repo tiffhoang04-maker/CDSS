@@ -1,0 +1,16 @@
+{
+  "scenario_id": "case_001",
+  "visibility": "model_visible",
+  "title": "Remote Expedition Medical Case",
+  "domain": "remote_acute_care",
+  "initial_stage": "initial_assessment",
+  "setting": {
+    "environment": "remote mountain expedition",
+    "current_altitude_m": 4800,
+    "care_context": "limited supplies and delayed evacuation"
+  },
+  "presenting_information": {
+    "chief_concern": "Severe headache, dizziness, and difficulty walking",
+    "reported_onset": "Symptoms worsened overnight"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "persona_id": "patient_001",
+  "name": "Dan",
+  "age": 47,
+  "sex": "male",
+  "crew_role": "experienced mountaineer",
+  "baseline_health": "healthy",
+  "medical_history": [
+    "nonsmoker; no additional medical history reported"
+  ],
+  "medications": [],
+  "allergies": [],
+  "baseline_vitals": {
+    "heart_rate_bpm": 68,
+    "blood_pressure_mmHg": "112/72",
+    "respiratory_rate_bpm": 14,
+    "oxygen_saturation_percent": 98,
+    "temperature_c": 36.8
+  }
+}

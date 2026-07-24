@@ -1,15 +1,11 @@
-# here's the actiual MCP server with four tools (detailed below)
-
-# edit 7/14: the goal is to
-# Automatically retrieve everything already available, explicitly identify what is missing, and ask the clinician only for information that is both obtainable and decision-relevant.
-
+# 07/24: i am laying this server to rest because it's gotten too overwhelming
 import re
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
 from neo4j_client import Neo4jClient
-from state_manager import (
+from cdss_mcp_server.project_build.state_manager_legacy import (
     read_patient_state,
     read_scenario,
     add_completed_action,
@@ -19,10 +15,8 @@ from state_manager import (
     update_stage,
 )
 
-
 mcp = FastMCP("CDSS MCP Server")
 neo4j_client = Neo4jClient()
-
 
 TEST_FIELD_IDS = {
     "ExMCaction:7": "carbon_dioxide",
@@ -233,11 +227,11 @@ def get_current_patient_state() -> dict[str, Any]:
             "title": scenario.get("title"),
             "domain": scenario.get("domain"),
             "setting": scenario.get("setting"),
-            "starting_context": scenario.get("starting_context")
+            "public_context": scenario.get("public_context", {})
         }
     }
 
-# initial assessment emergency "checklist" requirements that are used for terrestrial emergency triaging systems
+#initial assessment emergency "checklist" requirements that are used for terrestrial emergency triaging systems
 
 DEFAULT_INITIAL_ASSESSMENT_REQUIREMENTS = [
     # ---------------------------------------------------------
@@ -483,72 +477,17 @@ DEFAULT_INITIAL_ASSESSMENT_REQUIREMENTS = [
 ]
 
 
-def _known_scenario_value(
-    value: Any,
-    unit: str = ""
-) -> dict[str, Any]:
-    observation = {
-        "value": value,
-        "status": "known",
-        "source": "scenario"
-    }
-    if unit:
-        observation["unit"] = unit
-    return observation
-
-
-def _get_scenario_clinical_data(
-    scenario: dict[str, Any]
-) -> dict[str, Any]:
-    starting_context = scenario.get("starting_context", {})
-    observations = starting_context.get("initial_observations", {})
-    clinical_data: dict[str, Any] = {}
-    observation_mappings = {
-        "heart_rate_bpm": ("heart_rate", "beats/min"),
-        "spo2_percent_at_rest": ("spo2", "%"),
-        "respiratory_rate": ("respiratory_rate", "breaths/min"),
-        "blood_pressure": ("blood_pressure", "mmHg"),
-        "temperature": ("temperature", "degC"),
-        "lung_auscultation": ("lung_auscultation", ""),
-        "neurologic_findings": ("neurologic_findings", ""),
-        "reported_symptoms": ("reported_symptoms", ""),
-        "lake_louise_score": ("lake_louise_score", "")
-    }
-    for scenario_field, (clinical_field, unit) in observation_mappings.items():
-        value = observations.get(scenario_field)
-        if value is not None:
-            clinical_data[clinical_field] = _known_scenario_value(value, unit)
-
-    history = starting_context.get("history_of_present_illness")
-    if history:
-        clinical_data["chief_complaint"] = _known_scenario_value(history)
-        clinical_data["symptom_onset"] = _known_scenario_value(history[0])
-
-    environment = starting_context.get("environment")
-    if environment:
-        clinical_data["environmental_exposure"] = _known_scenario_value(
-            environment
-        )
-
-    relevant_history = starting_context.get("patient_profile", {}).get(
-        "relevant_history"
-    )
-    if relevant_history:
-        clinical_data["relevant_medical_history"] = _known_scenario_value(
-            relevant_history
-        )
-
-    return clinical_data
-
-
 def _get_merged_clinical_data(
     state: dict[str, Any],
     scenario: dict[str, Any]
 ) -> dict[str, Any]:
-    return {
-        **_get_scenario_clinical_data(scenario),
-        **state.get("clinical_data", {})
-    }
+    """Return only observations explicitly recorded in patient state.
+
+    Scenario fixtures may contain private or simulated findings, so values in
+    ``starting_context`` must not automatically become known clinical data.
+    """
+    del scenario
+    return dict(state.get("clinical_data", {}))
 
 
 def _get_information_requirements(
@@ -958,7 +897,7 @@ def reassess_patient() -> dict[str, Any]:
     }
 
 
-#differentail candidates have graph overlap and are considered potential candidates not confirmed diagnoses
+#differentail candidates have graph overlap and are considered potential candidates, not confirmed diagnoses
 @mcp.tool()
 def get_differential_diagnoses(limit: int = 10) -> dict[str, Any]:
     """

@@ -1,0 +1,37 @@
+{
+  "scenario_id": "case_001",
+  "reveals": {
+    "ask_ascent_history": {
+      "field_id": "ascent_history",
+      "value": "Rapid ascent from 2930 m to 4800 m after two nights",
+      "status": "known",
+      "source": "patient"
+    },
+    "measure_heart_rate": {
+      "field_id": "heart_rate",
+      "value": 110,
+      "unit": "beats/min",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "measure_spo2": {
+      "field_id": "spo2",
+      "value": 58,
+      "unit": "%",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "perform_neurologic_exam": {
+      "field_id": "coordination",
+      "value": "Impaired coordination and ataxia",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "perform_lung_auscultation": {
+      "field_id": "lung_auscultation",
+      "value": "Crackles and bubbling sounds",
+      "status": "abnormal",
+      "source": "simulation"
+    }
+  }
+}

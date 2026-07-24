@@ -1,5 +1,5 @@
 # for purposes of testing server.py; i don't use this file much anymore.
-from server import (
+from cdss_mcp_server.project_build.server_legacy import (
     get_current_patient_state,
     get_valid_options,
     submit_choice,

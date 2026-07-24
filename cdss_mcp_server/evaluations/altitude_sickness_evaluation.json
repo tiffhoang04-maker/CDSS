@@ -1,166 +1,35 @@
 {
-  "evaluation_id": "altitude_sickness_case_2_ijomeh_2012_evaluation",
-  "scenario_id": "altitude_sickness_public",
-  "visibility": "evaluator_only",
-  "source": {
-    "source_type": "published_case_report",
-    "article_title": "Acute Mountain Sickness, Two Cases and Their Treatment in the Field",
-    "authors": [
-      "Heikki M. Karinen",
-      "Heikki O. Tikkanen"
-    ],
-    "journal": "International Journal of Occupational Medicine and Environmental Health",
-    "year": 2012,
-    "volume": 25,
-    "issue": 3,
-    "pages": "304-309",
-    "doi": "10.2478/S13382-012-0037-3",
-    "case_used": "Case 2: Too rapid ascent and denial of symptoms",
-    "adaptation_note": "The presentation and observed-care timeline are paraphrased from the published case. Workflow stages and evaluation fields were added for MCP testing."
-  },
-  "stage_requirements": {
-    "Initial Assessment Stage": [
-      {
-        "requirement_id": "ALT-IA-001",
-        "description": "Confirm altitude exposure and speed of ascent.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-IA-002",
-        "description": "Assess headache, gastrointestinal symptoms, fatigue, dizziness, and sleep disturbance.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-IA-003",
-        "description": "Assess mental status, coordination, gait, and ataxia.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-IA-004",
-        "description": "Measure oxygen saturation, heart rate, and respiratory status.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-IA-005",
-        "description": "Assess lung sounds and symptoms of pulmonary edema.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-IA-006",
-        "description": "Determine whether descent, oxygen, evacuation, or hyperbaric treatment is available.",
-        "required": true
-      }
-    ],
-    "Diagnosis Stage": [
-      {
-        "requirement_id": "ALT-DX-001",
-        "description": "Evaluate acute mountain sickness using recent altitude gain, headache, associated symptoms, and Lake Louise score.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-DX-002",
-        "description": "Evaluate for high-altitude pulmonary edema based on hypoxemia, dyspnea, and abnormal lung findings.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-DX-003",
-        "description": "Evaluate for high-altitude cerebral edema based on ataxia, altered coordination, and neurologic deterioration.",
-        "required": true
-      }
-    ],
-    "Treatment Stage": [
-      {
-        "requirement_id": "ALT-TX-001",
-        "description": "Stop further ascent and initiate descent or evacuation when feasible.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-TX-002",
-        "description": "Assess the ability to provide supplemental oxygen.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-TX-003",
-        "description": "Select treatment appropriate to suspected AMS, HAPE, and/or HACE.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-TX-004",
-        "description": "Account for medication, oxygen, monitoring, and evacuation constraints.",
-        "required": true
-      }
-    ],
-    "Reevaluation Stage": [
-      {
-        "requirement_id": "ALT-MON-001",
-        "description": "Repeat oxygen saturation, heart rate, respiratory rate, neurologic assessment, and lung examination.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-MON-002",
-        "description": "Monitor urine output, cyanosis, orthopnea, and progression of pulmonary findings.",
-        "required": true
-      },
-      {
-        "requirement_id": "ALT-MON-003",
-        "description": "Escalate evacuation priority if hypoxemia or neurologic findings persist or worsen.",
-        "required": true
-      }
-    ]
-  },
-  "reference_outcomes": {
-    "article_diagnoses": [
-      "Acute mountain sickness",
-      "High-altitude pulmonary edema",
-      "High-altitude cerebral edema"
-    ],
-    "observed_initial_treatment": [
-      "Acetazolamide 250 mg",
-      "Nifedipine 20 mg",
-      "Dexamethasone 8 mg once, followed by 4 mg every 8 hours",
-      "Intermittent supplemental oxygen at 4 L/min for 20 minutes every couple of hours",
-      "Urgent evacuation planned"
-    ],
-    "observed_deterioration": [
-      "SpO2 remained 58% despite treatment",
-      "Increasing pulmonary fluid findings",
-      "Extreme pallor and cyanotic lips",
-      "Urine output stopped",
-      "Lake Louise score increased to 8",
-      "Dyspnea worsened when lying down"
-    ],
-    "observed_follow_up": [
-      "The patient remained seated overnight because lying down worsened dyspnea.",
-      "Evacuation and descent began after the transport delay.",
-      "At 1500 m, SpO2 was 91% and heart rate was 64 bpm.",
-      "Breathing became trouble-free, with only slight residual right basal lung findings.",
-      "Minor ataxia and light-headedness remained initially.",
-      "Acetazolamide and nifedipine were discontinued after descent.",
-      "The patient was symptom-free four weeks later."
-    ]
-  },
-  "evaluation_rubric": {
-    "expected_diagnostic_coverage": [
-      "acute mountain sickness",
-      "high altitude pulmonary edema",
-      "high altitude cerebral edema"
-    ],
-    "critical_actions": [
-      "Stop ascent",
-      "Recognize severe hypoxemia",
-      "Recognize pulmonary edema findings",
-      "Recognize neurologic signs including ataxia",
-      "Provide oxygen when available",
-      "Initiate urgent descent or evacuation",
-      "Monitor serial vital signs and neurologic status",
-      "Identify limited oxygen and delayed evacuation as resource gaps"
-    ],
-    "critical_errors": [
-      "Recommend continued ascent during active severe symptoms",
-      "Treat headache alone without assessing HAPE or HACE",
-      "Ignore SpO2 of 58%",
-      "Ignore ataxia or abnormal lung sounds",
-      "Recommend unavailable evacuation or oxygen without reporting a resource gap"
-    ]
-  }
+  "scenario_id": "case_001",
+  "visibility": "evaluation_only",
+  "expected_findings": [
+    "recent rapid ascent",
+    "severe headache",
+    "ataxia",
+    "severe hypoxemia",
+    "abnormal lung sounds"
+  ],
+  "acceptable_differential_diagnoses": [
+    "acute mountain sickness",
+    "high-altitude cerebral edema",
+    "high-altitude pulmonary edema"
+  ],
+  "primary_expected_diagnoses": [
+    "high-altitude cerebral edema",
+    "high-altitude pulmonary edema"
+  ],
+  "critical_actions": [
+    "administer supplemental oxygen",
+    "stop further ascent",
+    "initiate descent or evacuation planning",
+    "frequent reassessment"
+  ],
+  "resource_gap_expectations": [
+    "immediate evacuation transport unavailable",
+    "portable hyperbaric chamber availability unknown"
+  ],
+  "prohibited_model_inputs": [
+    "expected diagnosis",
+    "scoring criteria",
+    "source case outcome"
+  ]
 }

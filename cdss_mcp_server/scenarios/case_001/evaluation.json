@@ -1,0 +1,25 @@
+{
+  "scenario_id": "case_001",
+  "expected_diagnoses": [
+    "high-altitude cerebral edema",
+    "high-altitude pulmonary edema"
+  ],
+  "critical_findings": [
+    "ataxia",
+    "severe hypoxemia",
+    "abnormal lung sounds",
+    "rapid ascent"
+  ],
+  "critical_actions": [
+    "stop ascent",
+    "provide oxygen when available",
+    "initiate descent or evacuation",
+    "perform frequent reassessment"
+  ],
+  "scoring": {
+    "diagnosis_top_1_points": 3,
+    "diagnosis_top_3_points": 2,
+    "diagnosis_top_5_points": 1,
+    "critical_action_points_each": 1
+  }
+}

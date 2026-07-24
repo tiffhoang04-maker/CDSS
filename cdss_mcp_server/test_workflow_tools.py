@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-import server
-import state_manager
+import cdss_mcp_server.project_build.server_legacy as server_legacy
+import cdss_mcp_server.project_build.state_manager_legacy as state_manager_legacy
 
 
 class WorkflowToolTests(unittest.TestCase):
@@ -32,30 +32,32 @@ class WorkflowToolTests(unittest.TestCase):
             "current_diagnosis_ids": []
         }
 
-    def test_pending_results_skip_scenario_known_spo2(self) -> None:
-        pending = server._get_pending_test_results(self.state, self.scenario)
+    def test_pending_results_ignore_scenario_spo2(self) -> None:
+        pending = server_legacy._get_pending_test_results(self.state, self.scenario)
 
-        self.assertEqual(len(pending), 1)
-        self.assertEqual(pending[0]["test_id"], "ExMCaction:82")
-        self.assertEqual(pending[0]["field_id"], "blood_gases")
+        self.assertEqual(len(pending), 2)
+        self.assertEqual(pending[0]["test_id"], "ExMCaction:102")
+        self.assertEqual(pending[0]["field_id"], "spo2")
+        self.assertEqual(pending[1]["test_id"], "ExMCaction:82")
+        self.assertEqual(pending[1]["field_id"], "blood_gases")
 
-    def test_gap_assessment_merges_scenario_vitals(self) -> None:
-        assessment = server._assess_information_gaps_internal(
+    def test_gap_assessment_ignores_scenario_vitals(self) -> None:
+        assessment = server_legacy._assess_information_gaps_internal(
             self.state,
             self.scenario
         )
 
-        self.assertIn("spo2", assessment["known_information_fields"])
-        self.assertIn("heart_rate", assessment["known_information_fields"])
+        self.assertNotIn("spo2", assessment["known_information_fields"])
+        self.assertNotIn("heart_rate", assessment["known_information_fields"])
         missing_ids = {
             item["field_id"] for item in assessment["missing_information"]
         }
-        self.assertNotIn("spo2", missing_ids)
-        self.assertNotIn("heart_rate", missing_ids)
+        self.assertIn("spo2", missing_ids)
+        self.assertIn("heart_rate", missing_ids)
 
-    @patch.object(server, "reassess_patient", return_value={"next": "step"})
-    @patch.object(server, "record_patient_test_result")
-    @patch.object(server, "read_patient_state")
+    @patch.object(server_legacy, "reassess_patient", return_value={"next": "step"})
+    @patch.object(server_legacy, "record_patient_test_result")
+    @patch.object(server_legacy, "read_patient_state")
     def test_record_test_result_reassesses(
         self,
         read_state,
@@ -69,7 +71,7 @@ class WorkflowToolTests(unittest.TestCase):
             "result": "pH 7.40"
         }
 
-        result = server.record_test_result(
+        result = server_legacy.record_test_result(
             "ExMCaction:82",
             "pH 7.40",
             status="normal"
@@ -82,10 +84,10 @@ class WorkflowToolTests(unittest.TestCase):
             "blood_gases"
         )
 
-    @patch.object(server, "reassess_patient", return_value={"next": "step"})
-    @patch.object(server, "save_clinical_observation")
-    @patch.object(server, "read_scenario")
-    @patch.object(server, "read_patient_state")
+    @patch.object(server_legacy, "reassess_patient", return_value={"next": "step"})
+    @patch.object(server_legacy, "save_clinical_observation")
+    @patch.object(server_legacy, "read_scenario")
+    @patch.object(server_legacy, "read_patient_state")
     def test_record_clinical_observation_reassesses(
         self,
         read_state,
@@ -100,7 +102,7 @@ class WorkflowToolTests(unittest.TestCase):
             "status": "known"
         }
 
-        result = server.record_clinical_observation(
+        result = server_legacy.record_clinical_observation(
             "airway_status",
             "Airway open"
         )
@@ -108,8 +110,8 @@ class WorkflowToolTests(unittest.TestCase):
         self.assertTrue(result["accepted"])
         self.assertEqual(result["reassessment"], {"next": "step"})
 
-    @patch.object(state_manager, "write_patient_state")
-    @patch.object(state_manager, "read_patient_state")
+    @patch.object(state_manager_legacy, "write_patient_state")
+    @patch.object(state_manager_legacy, "read_patient_state")
     def test_state_manager_persists_test_and_clinical_result(
         self,
         read_state,
@@ -118,7 +120,7 @@ class WorkflowToolTests(unittest.TestCase):
         state = {}
         read_state.return_value = state
 
-        state_manager.record_patient_test_result(
+        state_manager_legacy.record_patient_test_result(
             test_id="ExMCaction:82",
             result="pH 7.40",
             field_id="blood_gases",
