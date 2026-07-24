@@ -1,0 +1,20 @@
+{
+  "patient_id": "current_patient",
+  "scenario_id": "case_001",
+  "persona_id": "patient_001",
+  "status": null,
+  "current_stage": null,
+  "clinical_data": {
+    "spo2": {
+      "value": 58,
+      "unit": "%",
+      "status": "abnormal",
+      "source": "simulation"
+    }
+  },
+  "completed_triggers": [
+    "measure_spo2"
+  ],
+  "working_differential": [],
+  "working_diagnosis": null
+}

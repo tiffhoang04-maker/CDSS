@@ -4,13 +4,13 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-from case_repository import (
-    CaseRepositoryError,
-    read_persona,
+from case_repo import (
+    CaseRepositoryError, # dis the class
+    read_persona, # these are functions of da class
     read_public_scenario,
     read_simulation_scenario
 )
-from cdss_mcp_server.project_build.state_manager_legacy import (
+from state_manager import (
     StateManagerError,
     initialize_patient_state,
     mark_trigger_completed,
@@ -41,6 +41,7 @@ def start_case(scenario_id: str) -> dict[str, Any]:
         persona_id = scenario["persona_id"]
         persona = read_persona(persona_id)
 
+# each successful call to start_case will create a new patient state for the selected scenario and persona, overwriting any existing patient state
         state = initialize_patient_state(
             scenario_id=scenario_id,
             persona_id=persona_id
@@ -84,12 +85,25 @@ def get_patient_state() -> dict[str, Any]:
 
 
 @mcp.tool()
+# trigger_id corresponds to a "reveal" field in the simulation.json
+# ex: perform_assessment("measure_spo2") will look up the hidden result associated with the measure_spo2 assessment
+#  and then add the SPO2 value in the visible patient state
 def perform_assessment(trigger_id: str) -> dict[str, Any]:
     """
-    Perform one supported assessment, question, examination, or measurement.
+    Perform one assessment from public_scenario.available_assessments.
 
-    The trigger_id must correspond to a reveal configured in the hidden
-    simulation fixture. The entire simulation fixture is never returned.
+    Use the exact trigger_id returned in available_assessments.
+    Never invent or modify a trigger ID.
+
+    for example, perform_assessment("measure_spo2") will look up the hidden result associated with the measure_spo2 assessment
+    and then add the SPO2 value in the visible patient state in this format:
+    "{"accepted": True,
+            "trigger_id": spo2,
+            "observation": {
+            },
+            "field_id": reveal["field_id"],
+            "patient_state": updated_state
+    }"
     """
     try:
         state = read_patient_state()
@@ -97,11 +111,19 @@ def perform_assessment(trigger_id: str) -> dict[str, Any]:
         reveals = simulation.get("reveals", {})
 
         if trigger_id not in reveals:
+            public_scenario = read_public_scenario(state["scenario_id"])
             return {
                 "accepted": False,
                 "trigger_id": trigger_id,
-                "reason": "Unsupported assessment trigger."
-            }
+                "reason": (
+                "Unsupported trigger_id. Use an exact trigger_id from "
+                "available_assessments."
+        ),
+        "available_assessments": public_scenario.get(
+            "available_assessments",
+            []
+        )
+    }
 
         if trigger_id in state.get("completed_triggers", []):
             field_id = reveals[trigger_id]["field_id"]
@@ -153,7 +175,19 @@ def record_user_observation(
     status: str = "known"
 ) -> dict[str, Any]:
     """
-    Record an observation supplied directly by the clinician or user.
+    Update current_patient.json with a new observation supplied directly by the clinician or user.
+    Add the completed trigger ID to completed_triggers list if the observation corresponds to a trigger in the simulation.json.
+    An example is ""completed_triggers": ["measure_spo2"]"
+
+    Add any patient vitals and other observations to the clinical_data dictionary in current_patient.json in this format:
+    "clinical_data": {
+        "spo2": {
+            "value": 95,
+            "unit": "%",
+            "status": "known",
+            "source": "user"
+        }
+    }"
     """
     allowed_statuses = {
         "known",
@@ -194,5 +228,5 @@ def record_user_observation(
 
 
 if __name__ == "__main__":
-    print("Starting CDSS MCP Server...", flush=True)
+    #print("Starting CDSS MCP Server...", flush=True)
     mcp.run(transport="stdio")
