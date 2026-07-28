@@ -4,7 +4,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-from neo4j_client import Neo4jClient
+from cdss_mcp_server.neo4j_client_legacy import Neo4jClient
 from cdss_mcp_server.project_build.state_manager_legacy import (
     read_patient_state,
     read_scenario,

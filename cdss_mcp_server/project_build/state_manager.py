@@ -53,18 +53,37 @@ def write_patient_state(state: dict[str, Any]) -> dict[str, Any]:
 # Create a fresh active patient state for the selected scenario and persona.
 def initialize_patient_state(
     scenario_id: str,
-    persona_id: str
+    persona_id: str,
+    initial_stage: str = "initial_assessment",
 ) -> dict[str, Any]:
+    """
+    create a fresh active state for a new case.
+    calling this function replaces the previous current-patient state.
+    """
     state = {
         "patient_id": "current_patient",
         "scenario_id": scenario_id,
         "persona_id": persona_id,
-        "status": None, #active or inactive
-        "current_stage": None, #initial_assessment, diagnosis, treatment, follow_up
+
+        #case lifecycle
+        "status": "active", #active or inactive
+
+        #track workfflow
+        "current_stage": initial_stage, #initial_assessment, diagnosis, treatment, follow_up
+        "stage_history": [initial_stage],
+
+        #collected clinical info
         "clinical_data": {},
         "completed_triggers": [],
+
+        # diagnostic state
         "working_differential": [],
-        "working_diagnosis": None
+        "working_diagnosis": None,
+
+        #treatment and follow-up
+        "available_actions": [],
+        "completed_actions": [],
+        "reassessment_count": 0
     }
 
     return write_patient_state(state)
@@ -101,5 +120,37 @@ def mark_trigger_completed(trigger_id: str) -> dict[str, Any]:
 
     if trigger_id not in completed:
         completed.append(trigger_id)
+
+    return write_patient_state(state)
+
+
+# hybrid function where user and llm works together to get to the next stage (user never sees it)
+def update_current_stage(new_stage: str) -> dict[str, Any]:
+    state = read_patient_state()
+
+    if state.get("current_stage") != new_stage:
+        state["current_stage"] = new_stage
+        state.setdefault("stage_history", []).append(new_stage)
+
+    return write_patient_state(state)
+
+def record_guidance_result(guidance_result: dict[str, Any]) -> dict[str, Any]:
+    """Save the latest clinical guidance and differential candidates."""
+
+    state = read_patient_state()
+
+    state["working_differential"] = guidance_result.get("candidates", [])
+
+    state["last_guidance"] = {
+        "status": guidance_result.get("status"),
+        "query_findings": guidance_result.get("query_findings", []),
+        "candidate_count": guidance_result.get("candidate_count", 0),
+        "needs_more_information": guidance_result.get(
+            "needs_more_information", False
+        ),
+        "recommended_next_step": guidance_result.get(
+            "recommended_next_step"
+        ),
+    }
 
     return write_patient_state(state)

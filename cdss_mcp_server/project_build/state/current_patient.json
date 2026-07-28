@@ -1,20 +1,244 @@
 {
   "patient_id": "current_patient",
-  "scenario_id": "case_001",
-  "persona_id": "patient_001",
-  "status": null,
-  "current_stage": null,
+  "scenario_id": "case_002",
+  "persona_id": "patient_002",
+  "status": "active",
+  "current_stage": "differential_diagnosis",
+  "stage_history": [
+    "initial_assessment",
+    "differential_diagnosis"
+  ],
   "clinical_data": {
-    "spo2": {
-      "value": 58,
-      "unit": "%",
+    "abdominal_pain": {
+      "value": "Pain began near the navel and migrated to the right lower abdomen; it is now constant and worse with movement",
+      "unit": "",
+      "status": "abnormal",
+      "source": "user"
+    },
+    "abdominal_exam": {
+      "value": "Focal right lower quadrant tenderness with guarding and pain on release",
+      "unit": "",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "gastrointestinal_symptoms": {
+      "value": "Nausea, one episode of vomiting, and loss of appetite; no diarrhea",
+      "unit": "",
+      "status": "abnormal",
+      "source": "patient"
+    },
+    "temperature": {
+      "value": 38.1,
+      "unit": "C",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "heart_rate": {
+      "value": 104,
+      "unit": "beats/min",
       "status": "abnormal",
       "source": "simulation"
     }
   },
   "completed_triggers": [
-    "measure_spo2"
+    "ask_pain_history",
+    "perform_abdominal_exam",
+    "ask_gastrointestinal_symptoms",
+    "measure_temperature",
+    "measure_heart_rate"
   ],
-  "working_differential": [],
-  "working_diagnosis": null
+  "working_differential": [
+    {
+      "diagnosis_id": "DOID:8337",
+      "diagnosis_name": "appendicitis",
+      "matched_symptoms": [
+        "abdomen, acute",
+        "abdominal pain",
+        "acute pain"
+      ],
+      "matched_count": 3,
+      "total_symptoms": 3,
+      "match_score": 1.0,
+      "matches_all": true
+    },
+    {
+      "diagnosis_id": "DOID:2913",
+      "diagnosis_name": "acute pancreatitis",
+      "matched_symptoms": [
+        "abdomen, acute",
+        "abdominal pain"
+      ],
+      "matched_count": 2,
+      "total_symptoms": 3,
+      "match_score": 0.6666666666666666,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:1949",
+      "diagnosis_name": "cholecystitis",
+      "matched_symptoms": [
+        "abdomen, acute",
+        "abdominal pain"
+      ],
+      "matched_count": 2,
+      "total_symptoms": 3,
+      "match_score": 0.6666666666666666,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:682",
+      "diagnosis_name": "compartment syndrome",
+      "matched_symptoms": [
+        "abdomen, acute",
+        "acute pain"
+      ],
+      "matched_count": 2,
+      "total_symptoms": 3,
+      "match_score": 0.6666666666666666,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:7475",
+      "diagnosis_name": "diverticulitis",
+      "matched_symptoms": [
+        "abdomen, acute",
+        "abdominal pain"
+      ],
+      "matched_count": 2,
+      "total_symptoms": 3,
+      "match_score": 0.6666666666666666,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:0060320",
+      "diagnosis_name": "inguinal hernia",
+      "matched_symptoms": [
+        "abdominal pain",
+        "acute pain"
+      ],
+      "matched_count": 2,
+      "total_symptoms": 3,
+      "match_score": 0.6666666666666666,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:8437",
+      "diagnosis_name": "intestinal obstruction",
+      "matched_symptoms": [
+        "abdomen, acute",
+        "abdominal pain"
+      ],
+      "matched_count": 2,
+      "total_symptoms": 3,
+      "match_score": 0.6666666666666666,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:345",
+      "diagnosis_name": "uterine disease",
+      "matched_symptoms": [
+        "abdomen, acute",
+        "abdominal pain"
+      ],
+      "matched_count": 2,
+      "total_symptoms": 3,
+      "match_score": 0.6666666666666666,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:1584",
+      "diagnosis_name": "acute chest syndrome",
+      "matched_symptoms": [
+        "acute pain"
+      ],
+      "matched_count": 1,
+      "total_symptoms": 3,
+      "match_score": 0.3333333333333333,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:11963",
+      "diagnosis_name": "esophagitis",
+      "matched_symptoms": [
+        "abdominal pain"
+      ],
+      "matched_count": 1,
+      "total_symptoms": 3,
+      "match_score": 0.3333333333333333,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:2326",
+      "diagnosis_name": "gastroenteritis",
+      "matched_symptoms": [
+        "abdominal pain"
+      ],
+      "matched_count": 1,
+      "total_symptoms": 3,
+      "match_score": 0.3333333333333333,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:9746",
+      "diagnosis_name": "hemorrhoid",
+      "matched_symptoms": [
+        "acute pain"
+      ],
+      "matched_count": 1,
+      "total_symptoms": 3,
+      "match_score": 0.3333333333333333,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:8536",
+      "diagnosis_name": "herpes zoster",
+      "matched_symptoms": [
+        "acute pain"
+      ],
+      "matched_count": 1,
+      "total_symptoms": 3,
+      "match_score": 0.3333333333333333,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:11206",
+      "diagnosis_name": "opioid abuse",
+      "matched_symptoms": [
+        "acute pain"
+      ],
+      "matched_count": 1,
+      "total_symptoms": 3,
+      "match_score": 0.3333333333333333,
+      "matches_all": false
+    },
+    {
+      "diagnosis_id": "DOID:9477",
+      "diagnosis_name": "pulmonary embolism",
+      "matched_symptoms": [
+        "abdominal pain"
+      ],
+      "matched_count": 1,
+      "total_symptoms": 3,
+      "match_score": 0.3333333333333333,
+      "matches_all": false
+    }
+  ],
+  "working_diagnosis": null,
+  "available_actions": [],
+  "completed_actions": [],
+  "reassessment_count": 0,
+  "last_guidance": {
+    "status": "needs_more_information",
+    "query_findings": [
+      "abdomen, acute",
+      "abdominal pain",
+      "acute pain"
+    ],
+    "candidate_count": 15,
+    "needs_more_information": true,
+    "recommended_next_step": {
+      "action": "collect_more_information",
+      "reason": "The graph-supported differential remains broad."
+    }
+  }
 }
