@@ -65,7 +65,8 @@ class ClinicalGuidanceService:
 
     def build_differential(
         self,
-        patient_state: dict[str, Any]
+        patient_state: dict[str, Any],
+        public_scenario: dict[str, Any]
     ) -> dict[str, Any]:
         symptom_terms = self.extract_abnormal_terms(
             patient_state
@@ -78,7 +79,9 @@ class ClinicalGuidanceService:
                 "status": "insufficient_information",
                 "query_findings": [],
                 "candidate_count": 0,
+               # "shortlist_count": 0,
                 "needs_more_information": True,
+               # "leading_candidate": None,
                 "candidates": [],
                 "recommended_next_step": {
                 "action": "collect_assessment_information",
@@ -100,6 +103,7 @@ class ClinicalGuidanceService:
             )
         )
 
+        #number of candidates retrieved from Neo4J
         candidate_count = len(candidates)
 
         top_candidate = candidates[0] if candidates else None

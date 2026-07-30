@@ -1,0 +1,28 @@
+{
+  "persona_id": "patient_002",
+  "name": "Maya",
+  "public_profile": {
+    "age_years": 29,
+    "sex": "female",
+    "role": "field researcher"
+  },
+  "record_accessible": {
+    "allergies": [],
+    "current_medications": [],
+    "baseline_vitals": {
+      "heart_rate_bpm": 72,
+      "respiratory_rate_bpm": 14,
+      "spo2_percent": 99,
+      "blood_pressure_mmhg": "116/74"
+    }
+  },
+  "history_reveals": {
+    "ask_medical_history": {
+      "field_id": "medical_history",
+      "value": "No prior abdominal surgery and no major medical history reported"
+    }
+  },
+  "simulation_traits": {
+    "symptom_reporting": "Answers clearly but appears uncomfortable and anxious"
+  }
+}

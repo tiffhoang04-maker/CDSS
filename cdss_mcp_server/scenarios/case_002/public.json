@@ -1,0 +1,38 @@
+{
+  "scenario_id": "case_002",
+  "persona_id": "patient_002",
+  "available_assessments": [
+    {
+      "trigger_id": "ask_pain_history",
+      "description": "Ask about the location, onset, and progression of the abdominal pain"
+    },
+    {
+      "trigger_id": "ask_gastrointestinal_symptoms",
+      "description": "Ask about nausea, vomiting, appetite, and bowel symptoms"
+    },
+    {
+      "trigger_id": "measure_temperature",
+      "description": "Measure the patient's temperature"
+    },
+    {
+      "trigger_id": "measure_heart_rate",
+      "description": "Measure the patient's heart rate"
+    },
+    {
+      "trigger_id": "perform_abdominal_exam",
+      "description": "Perform a focused abdominal examination"
+    }
+  ],
+  "visibility": "model_visible",
+  "title": "Acute Abdominal Pain Case",
+  "domain": "remote_acute_care",
+  "initial_stage": "initial_assessment",
+  "setting": {
+    "environment": "remote field clinic",
+    "care_context": "limited diagnostic imaging and delayed surgical consultation"
+  },
+  "presenting_information": {
+    "chief_concern": "Worsening abdominal pain with nausea and loss of appetite",
+    "reported_onset": "Pain began yesterday and has become more severe"
+  }
+}

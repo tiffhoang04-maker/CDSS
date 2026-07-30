@@ -1,5 +1,28 @@
 {
   "scenario_id": "case_001",
+  "persona_id": "patient_001",
+  "available_assessments": [
+    {
+      "trigger_id": "ask_ascent_history",
+      "description": "Ask about the patient's recent ascent history"
+    },
+    {
+      "trigger_id": "measure_heart_rate",
+      "description": "Measure the patient's heart rate"
+    },
+    {
+      "trigger_id": "measure_spo2",
+      "description": "Measure peripheral oxygen saturation"
+    },
+    {
+      "trigger_id": "perform_neurologic_exam",
+      "description": "Perform a neurologic and coordination examination"
+    },
+    {
+      "trigger_id": "perform_lung_auscultation",
+      "description": "Auscultate the patient's lungs"
+    }
+  ],
   "visibility": "model_visible",
   "title": "Remote Expedition Medical Case",
   "domain": "remote_acute_care",

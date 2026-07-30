@@ -1,0 +1,24 @@
+{
+  "scenario_id": "case_002",
+  "expected_diagnoses": [
+    "appendicitis"
+  ],
+  "critical_findings": [
+    "migratory abdominal pain",
+    "right lower quadrant tenderness",
+    "guarding and pain on release",
+    "fever",
+    "nausea and loss of appetite"
+  ],
+  "critical_actions": [
+    "arrange urgent surgical evaluation or evacuation",
+    "keep the patient from eating or drinking pending evaluation",
+    "monitor vital signs and reassess for deterioration"
+  ],
+  "scoring": {
+    "diagnosis_top_1_points": 3,
+    "diagnosis_top_3_points": 2,
+    "diagnosis_top_5_points": 1,
+    "critical_action_points_each": 1
+  }
+}

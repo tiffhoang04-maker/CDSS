@@ -1,0 +1,3 @@
+chainlit==2.11.1
+mcp==1.28.1
+ollama==0.6.2

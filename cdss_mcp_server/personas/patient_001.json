@@ -1,0 +1,28 @@
+{
+  "persona_id": "patient_001",
+  "name": "Dan",
+  "public_profile": {
+    "age_years": 47,
+    "sex": "male",
+    "role": "expedition participant"
+  },
+  "record_accessible": {
+    "allergies": [],
+    "current_medications": [],
+    "baseline_vitals": {
+      "heart_rate_bpm": 68,
+      "respiratory_rate_bpm": 14,
+      "spo2_percent": 98,
+      "blood_pressure_mmhg": "122/78"
+    }
+  },
+  "history_reveals": {
+    "ask_medical_history": {
+      "field_id": "medical_history",
+      "value": "No major medical history reported"
+    }
+  },
+  "simulation_traits": {
+    "symptom_reporting": "Tends to minimize symptoms"
+  }
+}

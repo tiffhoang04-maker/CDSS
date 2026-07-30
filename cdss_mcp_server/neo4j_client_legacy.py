@@ -15,7 +15,7 @@ class Neo4jClient:
         self.uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
         self.username = os.getenv("NEO4J_USERNAME", "neo4j")
         self.password = os.getenv("NEO4J_PASSWORD")
-        self.database = os.getenv("NEO4J_DATABASE", "exmc")
+        self.database = os.getenv("NEO4J_DATABASE", "integrated")
 
         if not self.password:
             raise ValueError("NEO4J_PASSWORD is missing from .env")

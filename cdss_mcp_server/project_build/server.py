@@ -471,6 +471,106 @@ def get_clinical_guidance(
             "reason": str(error),
         }
 
+
+@mcp.tool()
+def get_medkit_treatment_options(
+    diagnosis_id: str,
+    limit: int = 20,
+) -> dict[str, Any]:
+    """
+    Return only exact MedKit nodes that Neo4j connects to one diagnosis.
+
+    Use an exact diagnosis_id from get_clinical_guidance. Results are a
+    closed-world list: never add, infer, or substitute treatments that are not
+    present in options. If option_count is zero, report that the knowledge
+    graph contains no MedKit treatment options for this diagnosis.
+
+    A MedKit node's presence in Neo4j establishes graph provenance, not proof
+    that the item is physically usable, clinically appropriate, or sufficient
+    for definitive care in the current scenario.
+    """
+    try:
+        state = read_patient_state()
+        working_differential = state.get(
+            "working_differential",
+            [],
+        )
+        allowed_diagnoses = {
+            str(candidate.get("diagnosis_id")): candidate.get(
+                "diagnosis_name"
+            )
+            for candidate in working_differential
+            if candidate.get("diagnosis_id")
+        }
+
+        if diagnosis_id not in allowed_diagnoses:
+            return {
+                "success": False,
+                "diagnosis_id": diagnosis_id,
+                "reason": (
+                    "diagnosis_id is not in the current graph-supported "
+                    "working differential. Use an exact diagnosis_id from "
+                    "get_clinical_guidance."
+                ),
+                "allowed_diagnoses": [
+                    {
+                        "diagnosis_id": candidate_id,
+                        "diagnosis_name": diagnosis_name,
+                    }
+                    for candidate_id, diagnosis_name in sorted(
+                        allowed_diagnoses.items()
+                    )
+                ],
+                "closed_world": True,
+            }
+
+        safe_limit = max(1, min(int(limit), 50))
+        options = knowledge_repo.find_medkit_treatment_options(
+            diagnosis_id=diagnosis_id,
+            limit=safe_limit,
+        )
+
+        return {
+            "success": True,
+            "diagnosis_id": diagnosis_id,
+            "diagnosis_name": allowed_diagnoses[diagnosis_id],
+            "option_count": len(options),
+            "options": options,
+            "closed_world": True,
+            "provenance": {
+                "source": "Neo4j",
+                "node_label": "MedKit",
+                "allowed_relationships": [
+                    "MAPSTO_CmD",
+                    "TREATS_MKtC",
+                    "ASSISTSTREATMENT_MKaC",
+                    "INCLUDES_MKiMK",
+                ],
+            },
+            "model_instruction": (
+                "Return only exact options from this result. "
+                "Do not add treatments from general medical knowledge."
+                if options
+                else (
+                    "No graph-supported MedKit treatment options were found. "
+                    "Do not propose or imply that any other treatment is "
+                    "present in the MedKit graph."
+                )
+            ),
+            "warning": (
+                "Graph presence does not independently verify physical "
+                "availability or clinical appropriateness."
+            ),
+        }
+
+    except (StateManagerError, Neo4jClientError, ValueError) as error:
+        return {
+            "success": False,
+            "diagnosis_id": diagnosis_id,
+            "reason": str(error),
+            "closed_world": True,
+        }
+
 if __name__ == "__main__":
     #print("Starting CDSS MCP Server...", flush=True)
     mcp.run(transport="stdio")

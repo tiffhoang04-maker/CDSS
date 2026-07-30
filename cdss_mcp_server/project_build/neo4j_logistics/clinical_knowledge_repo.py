@@ -65,3 +65,122 @@ class ClinicalKnowledgeRepo:
                 ],
             }
         )
+    
+    # this is here because some cases are not "disease" nodes but are "condition" nodes
+    def find_condition_candidates(
+    self,
+    symptom_terms: list[str],
+    context_terms: list[str],
+) -> list[dict[str, Any]]:
+        query = """
+        MATCH (c:Condition)
+
+        OPTIONAL MATCH (c)-[:MAPSTO_CmS]-(s:Symptom)
+        WHERE toLower(trim(s.name)) IN $symptom_terms
+
+        WITH
+            c,
+            collect(DISTINCT toLower(trim(s.name))) AS matched_symptoms,
+            [
+                term IN $context_terms
+                WHERE toLower(c.name) CONTAINS term
+            ] AS matched_context
+
+        WHERE
+            size(matched_symptoms) > 0
+            OR size(matched_context) > 0
+
+        RETURN
+            c.identifier AS candidate_id,
+            c.name AS candidate_name,
+            "Condition" AS candidate_type,
+            matched_symptoms,
+            matched_context,
+            size(matched_symptoms) AS matched_symptom_count,
+            size(matched_context) AS matched_context_count,
+            "Neo4j Condition" AS provenance
+
+        ORDER BY
+            matched_context_count DESC,
+            matched_symptom_count DESC,
+            candidate_name
+        """
+
+        return self.client.run_query(
+            query,
+            {
+                "symptom_terms": [
+                    term.lower().strip()
+                    for term in symptom_terms
+                ],
+                "context_terms": [
+                    term.lower().strip()
+                    for term in context_terms
+                ],
+            },
+        )
+
+    def find_medkit_treatment_options(
+        self,
+        diagnosis_id: str,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        """
+        Return exact MedKit nodes connected to a Disease through an approved
+        Condition treatment path.
+
+        This is deliberately a closed-world query. A medically plausible item
+        is not returned unless the required Neo4j relationships exist.
+        """
+        query = """
+        MATCH (d:Disease {identifier: $diagnosis_id})
+        MATCH (c:Condition)-[:MAPSTO_CmD]-(d)
+        MATCH (m:MedKit)-[treats:TREATS_MKtC|ASSISTSTREATMENT_MKaC]-(c)
+
+        OPTIONAL MATCH (category:MedKit)-[:INCLUDES_MKiMK]-(m)
+        WHERE category.is_category = true
+
+        WITH
+            d,
+            c,
+            m,
+            collect(DISTINCT type(treats)) AS treatment_relationships,
+            [
+                category_data IN collect(DISTINCT {
+                    medkit_id: category.identifier,
+                    name: category.name
+                })
+                WHERE category_data.medkit_id IS NOT NULL
+            ] AS categories
+
+        RETURN
+            m.identifier AS medkit_id,
+            m.name AS name,
+            m.phrase AS phrase,
+            m.route_of_use AS route_of_use,
+            m.strength_volume AS strength_volume,
+            m.location AS location,
+            m.qty_in_pack AS qty_in_pack,
+            m.side_effects AS side_effects,
+            m.comments AS comments,
+            m.is_category AS is_category,
+            c.identifier AS condition_id,
+            c.name AS condition_name,
+            d.identifier AS diagnosis_id,
+            d.name AS diagnosis_name,
+            treatment_relationships,
+            categories
+
+        ORDER BY
+            toLower(coalesce(m.name, m.phrase, m.identifier))
+        LIMIT $limit
+        """
+
+        safe_limit = max(1, min(int(limit), 50))
+        return self.client.run_query(
+            query,
+            {
+                "diagnosis_id": diagnosis_id,
+                "limit": safe_limit,
+            },
+        )

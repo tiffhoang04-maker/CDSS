@@ -1,0 +1,37 @@
+{
+  "scenario_id": "case_002",
+  "reveals": {
+    "ask_pain_history": {
+      "field_id": "abdominal_pain",
+      "value": "Pain began near the navel and migrated to the right lower abdomen; it is now constant and worse with movement",
+      "status": "abnormal",
+      "source": "patient"
+    },
+    "ask_gastrointestinal_symptoms": {
+      "field_id": "gastrointestinal_symptoms",
+      "value": "Nausea, one episode of vomiting, and loss of appetite; no diarrhea",
+      "status": "abnormal",
+      "source": "patient"
+    },
+    "measure_temperature": {
+      "field_id": "temperature",
+      "value": 38.1,
+      "unit": "C",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "measure_heart_rate": {
+      "field_id": "heart_rate",
+      "value": 104,
+      "unit": "beats/min",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "perform_abdominal_exam": {
+      "field_id": "abdominal_exam",
+      "value": "Focal right lower quadrant tenderness with guarding and pain on release",
+      "status": "abnormal",
+      "source": "simulation"
+    }
+  }
+}
