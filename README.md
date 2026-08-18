@@ -81,14 +81,11 @@ additional assessments are needed.
 
 ---
 
-## Architecture
+## Repository Structure
 
 The prototype separates patient information, scenario data, application logic, and knowledge-graph retrieval.
 
 ```text
-.chainlit/
-|** will update later but it has the app.py and interface application;
-|pasting in your terminal should launch the application in your web browser: chainlit run chainlit_ui/app.py -w
 cdss-mcp-server/
 ├── server.py
 ├── state_manager.py
@@ -113,16 +110,43 @@ cdss-mcp-server/
 ├── config/
 │   └── observation_mappings.json
 │
-└── prompts/
-    └── [prompt files]
+├── prompts/
+│   └── [prompt files]
+│
+├── chainlit_ui/
+│   └── app.py
+│
+├── .chainlit/
+│   └── [Chainlit configuration files]
+│
+└── Charlotte_model_scripts/
+    └── [foundational Python scripts]
 ```
-chainlit_ui/
-** will update later :D
 
-Charlotte_model_scripts/
-** a fraction of the python scripts that first set the foundation for this project; it includes the different functions (but no mcp server)
-** her application is ran on Streamlit!
-** Charlotte's project analyzes Pneumothorax as a "canned scenario"; those scenario scripts are not available here.
+## Launching the Chainlit Interface
+
+The current project includes a **Chainlit-based user interface** located in the `chainlit_ui/` directory.
+
+From the project root, run:
+
+```bash
+chainlit run chainlit_ui/app.py -w
+```
+
+This launches the application and opens the Chainlit interface in your web browser.
+
+> **Note:** Documentation for the `chainlit_ui/` and `.chainlit/` directories will be expanded as the interface is further developed.
+
+## Foundational Model Scripts
+
+The `Charlotte_model_scripts/` directory contains a subset of the Python scripts that helped establish the foundation for this project.
+
+These scripts include several of the original clinical decision-support functions, but **do not implement an MCP server**.
+
+The earlier application uses **Streamlit** as its user interface and was developed around **pneumothorax as a predefined ("canned") clinical scenario**.
+
+> **Note:** The scenario-specific files used by the original pneumothorax application are not included in this repository.
+
 
 ### Main Components
 
