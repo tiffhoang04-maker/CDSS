@@ -419,7 +419,7 @@ state/current_patient.example.json
 
 The server is designed to retrieve biomedical relationships from a Neo4j knowledge graph.
 
-The current project is based on the Exploration Medical Capability knowledge graph and may include mapped or imported information from external biomedical knowledge graphs.
+The current project is based on the Exploration Medical Capability knowledge graph and may include mapped or imported information from external biomedical knowledge graphs. PrimeKG and other open-source biomedical knowledge graphs are used to enhance the relationships between nodes. An Exmc_integrated KG dump file can be found on Sharepoint (since it's too big to be on GitHub).
 
 Example node types include:
 
