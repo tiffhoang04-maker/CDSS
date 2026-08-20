@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+import inspect
+import json
+import logging
+import os
+import time
+from datetime import datetime, timezone
+from functools import wraps
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
@@ -21,7 +30,201 @@ from state_manager import (
 )
 
 
+LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
+LOG_FILE = LOG_DIR / "mcp_server.log"
+LOG_PAYLOADS = os.getenv(
+    "MCP_LOG_PAYLOADS",
+    "false",
+).strip().lower() in {"1", "true", "yes", "on"}
+
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+logger = logging.getLogger("cdss_mcp_server")
+logger.setLevel(
+    getattr(
+        logging,
+        os.getenv("MCP_LOG_LEVEL", "INFO").upper(),
+        logging.INFO,
+    )
+)
+logger.propagate = False
+
+if not any(
+    isinstance(handler, RotatingFileHandler)
+    and Path(handler.baseFilename) == LOG_FILE
+    for handler in logger.handlers
+):
+    file_handler = RotatingFileHandler(
+        LOG_FILE,
+        mode="w",
+        maxBytes=2_000_000,
+        backupCount=5,
+        encoding="utf-8",
+    )
+    file_handler.setFormatter(logging.Formatter("%(message)s"))
+    logger.addHandler(file_handler)
+
+
+def _log_event(event: str, **details: Any) -> None:
+    """Write one JSON event to the file logger, never to MCP stdout."""
+    logger.info(
+        json.dumps(
+            {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "event": event,
+                **details,
+            },
+            default=str,
+            sort_keys=True,
+        )
+    )
+
+
+def _safe_inputs(inputs: dict[str, Any]) -> dict[str, Any]:
+    """Avoid persisting observation text unless payload logging is enabled."""
+    if LOG_PAYLOADS:
+        return inputs
+
+    safe = dict(inputs)
+    if "value" in safe:
+        safe["value"] = (
+            f"<omitted; {len(str(safe['value']))} characters>"
+        )
+    return safe
+
+
+def _result_summary(result: Any) -> dict[str, Any]:
+    """Extract useful trace metadata without copying entire tool payloads."""
+    if not isinstance(result, dict):
+        return {"result_type": type(result).__name__}
+
+    summary_keys = {
+        "accepted",
+        "candidate_id",
+        "candidate_type",
+        "diagnosis_id",
+        "field_id",
+        "found",
+        "option_count",
+        "query",
+        "reason",
+        "started",
+        "status",
+        "success",
+        "task",
+        "trigger_id",
+    }
+    summary = {
+        key: result[key]
+        for key in summary_keys
+        if key in result
+    }
+
+    patient_state = result.get("patient_state")
+    if isinstance(patient_state, dict):
+        summary["patient_state"] = {
+            "scenario_id": patient_state.get("scenario_id"),
+            "current_stage": patient_state.get("current_stage"),
+            "clinical_data_fields": sorted(
+                patient_state.get("clinical_data", {})
+            ),
+            "completed_triggers": patient_state.get(
+                "completed_triggers",
+                [],
+            ),
+            "differential_count": len(
+                patient_state.get("working_differential", [])
+            ),
+        }
+
+    candidates = result.get("candidates")
+    if isinstance(candidates, list):
+        summary["candidates"] = [
+            {
+                "id": (
+                    item.get("candidate_id")
+                    or item.get("diagnosis_id")
+                ),
+                "name": (
+                    item.get("candidate_name")
+                    or item.get("diagnosis_name")
+                ),
+                "type": item.get("candidate_type"),
+            }
+            for item in candidates
+            if isinstance(item, dict)
+        ]
+
+    options = result.get("options")
+    if isinstance(options, list):
+        summary["options"] = [
+            {
+                "medkit_id": item.get("medkit_id"),
+                "name": item.get("name"),
+            }
+            for item in options
+            if isinstance(item, dict)
+        ]
+
+    return summary
+
+
+def _logged_tool(function):
+    """Log synchronous MCP tool inputs, results, duration, and exceptions."""
+    signature = inspect.signature(function)
+
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        bound = signature.bind_partial(*args, **kwargs)
+        bound.apply_defaults()
+        inputs = _safe_inputs(dict(bound.arguments))
+        started_at = time.perf_counter()
+
+        _log_event(
+            "tool_start",
+            tool=function.__name__,
+            inputs=inputs,
+        )
+
+        try:
+            result = function(*args, **kwargs)
+        except Exception as error:
+            _log_event(
+                "tool_exception",
+                tool=function.__name__,
+                duration_ms=round(
+                    (time.perf_counter() - started_at) * 1000,
+                    2,
+                ),
+                error_type=type(error).__name__,
+                error=str(error),
+            )
+            raise
+
+        event = {
+            "tool": function.__name__,
+            "duration_ms": round(
+                (time.perf_counter() - started_at) * 1000,
+                2,
+            ),
+            "summary": _result_summary(result),
+        }
+        if LOG_PAYLOADS:
+            event["result"] = result
+        _log_event("tool_end", **event)
+        return result
+
+    return wrapper
+
+
 mcp = FastMCP("CDSS MCP Server")
+
+_log_event(
+    "server_module_loaded",
+    server="CDSS MCP Server",
+    log_file=str(LOG_FILE),
+    payload_logging=LOG_PAYLOADS,
+)
 
 
 def _public_persona_view(persona: dict[str, Any]) -> dict[str, Any]:
@@ -34,6 +237,7 @@ def _public_persona_view(persona: dict[str, Any]) -> dict[str, Any]:
 
 
 @mcp.tool()
+@_logged_tool
 def start_case(scenario_id: str) -> dict[str, Any]:
     """
     Initialize one simulation case from the scenario id and return only model-visible case data.
@@ -76,6 +280,7 @@ def start_case(scenario_id: str) -> dict[str, Any]:
 
 
 @mcp.tool()
+@_logged_tool
 def get_patient_state() -> dict[str, Any]:
     """
     Return the current model-visible patient state and public case context.
@@ -167,6 +372,7 @@ def _workflow_status(
     }
 
 @mcp.tool()
+@_logged_tool
 def get_workflow_status() -> dict[str, Any]:
     """
     Return the current workflow state and recommend the next useful step.
@@ -202,6 +408,7 @@ def get_workflow_status() -> dict[str, Any]:
 # trigger_id corresponds to a "reveal" field in the simulation.json
 # ex: perform_assessment("measure_spo2") will look up the hidden result associated with the measure_spo2 assessment
 #  and then add the SPO2 value in the visible patient state
+@_logged_tool
 def perform_assessment(trigger_id: str) -> dict[str, Any]:
     """
     Perform one assessment from public_scenario.available_assessments.
@@ -282,6 +489,7 @@ def perform_assessment(trigger_id: str) -> dict[str, Any]:
 
 
 @mcp.tool()
+@_logged_tool
 def record_user_observation(
     field_id: str,
     value: str,
@@ -359,6 +567,7 @@ guidance = ClinicalGuidanceService(
 )
 
 @mcp.tool()
+@_logged_tool
 def get_clinical_guidance(
     task: str = "differential",
 ) -> dict[str, Any]:
@@ -370,7 +579,7 @@ def get_clinical_guidance(
 
     For task="differential":
     - Read visible findings from the current patient state.
-    - Retrieve graph-supported candidate diagnoses.
+    - Retrieve graph-supported Disease and Condition candidates.
     - Save the resulting differential to patient state.
     - Automatically update the workflow to differential_diagnosis when
       useful findings were evaluated.
@@ -405,9 +614,11 @@ def get_clinical_guidance(
 
     try:
         state = read_patient_state()
+        scenario = read_public_scenario(state["scenario_id"])
 
         result = guidance.build_differential(
-            patient_state=state
+            patient_state=state,
+            public_scenario=scenario,
         )
 
         if not result.get("success", False):
@@ -470,70 +681,100 @@ def get_clinical_guidance(
             "task": task,
             "reason": str(error),
         }
+    
+@mcp.tool()
+@_logged_tool
+def resolve_graph_candidate(
+    candidate_name: str,
+) -> dict[str, Any]:
+    """
+    Resolve an exact clinical name to a Disease or Condition node.
 
+    Disease is searched first. Condition is searched only when no Disease
+    has the requested case-insensitive exact name. This tool does not perform
+    fuzzy matching or infer a diagnosis.
+    """
+    try:
+        candidate = knowledge_repo.find_candidate_by_name(
+            candidate_name
+        )
+
+        if candidate is None:
+            return {
+                "found": False,
+                "query": candidate_name,
+                "candidate": None,
+                "search_order": [
+                    "Disease",
+                    "Condition",
+                ],
+                "reason": (
+                    "No exact Disease or Condition name matched."
+                ),
+            }
+
+        return {
+            "found": True,
+            "query": candidate_name,
+            "candidate": candidate,
+            "search_order": [
+                "Disease",
+                "Condition",
+            ],
+            "provenance": "Neo4j exact-name resolution",
+        }
+
+    except Neo4jClientError as error:
+        return {
+            "found": False,
+            "query": candidate_name,
+            "candidate": None,
+            "search_order": [
+                "Disease",
+                "Condition",
+            ],
+            "reason": str(error),
+        }
 
 @mcp.tool()
+@_logged_tool
 def get_medkit_treatment_options(
-    diagnosis_id: str,
+    candidate_id: str,
+    candidate_type: str,
     limit: int = 20,
 ) -> dict[str, Any]:
     """
-    Return only exact MedKit nodes that Neo4j connects to one diagnosis.
+    Return only exact MedKit nodes connected to a resolved Disease or
+    Condition candidate.
 
-    Use an exact diagnosis_id from get_clinical_guidance. Results are a
-    closed-world list: never add, infer, or substitute treatments that are not
-    present in options. If option_count is zero, report that the knowledge
-    graph contains no MedKit treatment options for this diagnosis.
-
-    A MedKit node's presence in Neo4j establishes graph provenance, not proof
-    that the item is physically usable, clinically appropriate, or sufficient
-    for definitive care in the current scenario.
+    candidate_id and candidate_type must come from
+    resolve_graph_candidate. Treat the returned options as a closed-world
+    list. Never add treatments that are absent from the result.
     """
-    try:
-        state = read_patient_state()
-        working_differential = state.get(
-            "working_differential",
-            [],
-        )
-        allowed_diagnoses = {
-            str(candidate.get("diagnosis_id")): candidate.get(
-                "diagnosis_name"
-            )
-            for candidate in working_differential
-            if candidate.get("diagnosis_id")
+    if candidate_type not in {"Disease", "Condition"}:
+        return {
+            "success": False,
+            "candidate_id": candidate_id,
+            "candidate_type": candidate_type,
+            "reason": (
+                "candidate_type must be Disease or Condition."
+            ),
+            "closed_world": True,
         }
 
-        if diagnosis_id not in allowed_diagnoses:
-            return {
-                "success": False,
-                "diagnosis_id": diagnosis_id,
-                "reason": (
-                    "diagnosis_id is not in the current graph-supported "
-                    "working differential. Use an exact diagnosis_id from "
-                    "get_clinical_guidance."
-                ),
-                "allowed_diagnoses": [
-                    {
-                        "diagnosis_id": candidate_id,
-                        "diagnosis_name": diagnosis_name,
-                    }
-                    for candidate_id, diagnosis_name in sorted(
-                        allowed_diagnoses.items()
-                    )
-                ],
-                "closed_world": True,
-            }
-
+    try:
         safe_limit = max(1, min(int(limit), 50))
+
         options = knowledge_repo.find_medkit_treatment_options(
-            diagnosis_id=diagnosis_id,
+            candidate_id=candidate_id,
+            candidate_type=candidate_type,
             limit=safe_limit,
         )
 
         return {
             "success": True,
-            "diagnosis_id": diagnosis_id,
-            "diagnosis_name": allowed_diagnoses[diagnosis_id],
+            "candidate_id": candidate_id,
+            "candidate_type": candidate_type,
             "option_count": len(options),
             "options": options,
             "closed_world": True,
@@ -548,13 +789,12 @@ def get_medkit_treatment_options(
                 ],
             },
             "model_instruction": (
-                "Return only exact options from this result. "
-                "Do not add treatments from general medical knowledge."
+                "Return only exact options from this result."
                 if options
                 else (
-                    "No graph-supported MedKit treatment options were found. "
-                    "Do not propose or imply that any other treatment is "
-                    "present in the MedKit graph."
+                    "No graph-supported MedKit treatment options "
+                    "were found. Do not add treatments from general "
+                    "medical knowledge."
                 )
             ),
             "warning": (
@@ -563,14 +803,20 @@ def get_medkit_treatment_options(
             ),
         }
 
-    except (StateManagerError, Neo4jClientError, ValueError) as error:
+    except (Neo4jClientError, ValueError) as error:
         return {
             "success": False,
-            "diagnosis_id": diagnosis_id,
+            "candidate_id": candidate_id,
+            "candidate_type": candidate_type,
             "reason": str(error),
             "closed_world": True,
         }
 
 if __name__ == "__main__":
     #print("Starting CDSS MCP Server...", flush=True)
+    _log_event(
+        "server_start",
+        server="CDSS MCP Server",
+        transport="stdio",
+    )
     mcp.run(transport="stdio")

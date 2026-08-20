@@ -41,6 +41,16 @@ class RunAgentTurnTests(unittest.IsolatedAsyncioTestCase):
             "Treat that tool's result as a closed world",
             SYSTEM_PROMPT,
         )
+
+    def test_system_prompt_stops_after_assessment_batch(self):
+        self.assertIn(
+            "include all requested",
+            SYSTEM_PROMPT,
+        )
+        self.assertIn(
+            "Clinical guidance requires a separate user message",
+            SYSTEM_PROMPT,
+        )
         self.assertIn(
             "Do not add or substitute treatments",
             SYSTEM_PROMPT,
@@ -134,6 +144,93 @@ class RunAgentTurnTests(unittest.IsolatedAsyncioTestCase):
         call = client.chat.await_args
         self.assertEqual(call.kwargs["think"], "low")
         self.assertEqual(call.kwargs["options"]["num_ctx"], 8192)
+
+    async def test_assessment_batch_is_displayed_before_differential(self):
+        client = SimpleNamespace(
+            chat=AsyncMock(
+                side_effect=[
+                    _response(
+                        tool_calls=[
+                            _tool_call(
+                                "perform_assessment",
+                                {"trigger_id": "measure_heart_rate"},
+                            ),
+                            _tool_call(
+                                "get_clinical_guidance",
+                                {"task": "differential"},
+                            ),
+                        ]
+                    ),
+                    _response(
+                        tool_calls=[
+                            _tool_call(
+                                "perform_assessment",
+                                {"trigger_id": "measure_spo2"},
+                            ),
+                        ]
+                    ),
+                    _response("Assessment batch complete."),
+                    _response(
+                        "Recorded: heart rate 110 beats/min and SpO2 58%."
+                    ),
+                ]
+            )
+        )
+        call_tool = AsyncMock(return_value='{"accepted": true}')
+        messages = [
+            {
+                "role": "user",
+                "content": "Measure heart rate and SpO2.",
+            }
+        ]
+
+        answer = await run_agent_turn(
+            client=client,
+            model="test-model",
+            messages=messages,
+            tools=[
+                {
+                    "type": "function",
+                    "function": {"name": "perform_assessment"},
+                },
+                {
+                    "type": "function",
+                    "function": {"name": "get_clinical_guidance"},
+                },
+            ],
+            call_tool=call_tool,
+        )
+
+        self.assertIn("heart rate 110", answer)
+        self.assertEqual(call_tool.await_count, 2)
+        self.assertEqual(
+            [call.args for call in call_tool.await_args_list],
+            [
+                (
+                    "perform_assessment",
+                    {"trigger_id": "measure_heart_rate"},
+                ),
+                (
+                    "perform_assessment",
+                    {"trigger_id": "measure_spo2"},
+                ),
+            ],
+        )
+        self.assertEqual(client.chat.await_count, 4)
+        continuation_tools = client.chat.await_args_list[1].kwargs["tools"]
+        self.assertEqual(len(continuation_tools), 1)
+        self.assertEqual(
+            continuation_tools[0]["function"]["name"],
+            "perform_assessment",
+        )
+        self.assertEqual(client.chat.await_args_list[3].kwargs["tools"], [])
+        deferred = [
+            message
+            for message in messages
+            if message.get("role") == "tool"
+            and "deferred_until_next_user_turn" in message["content"]
+        ]
+        self.assertEqual(len(deferred), 1)
 
 
 if __name__ == "__main__":

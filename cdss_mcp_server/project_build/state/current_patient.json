@@ -1,17 +1,149 @@
 {
   "patient_id": "current_patient",
-  "scenario_id": "case_002",
-  "persona_id": "patient_002",
+  "scenario_id": "case_001",
+  "persona_id": "patient_001",
   "status": "active",
-  "current_stage": "initial_assessment",
+  "current_stage": "differential_diagnosis",
   "stage_history": [
-    "initial_assessment"
+    "initial_assessment",
+    "differential_diagnosis"
   ],
-  "clinical_data": {},
-  "completed_triggers": [],
-  "working_differential": [],
+  "clinical_data": {
+    "ascent_history": {
+      "value": "Rapid ascent from 2930 m to 4800 m after two nights",
+      "unit": "",
+      "status": "known",
+      "source": "patient"
+    },
+    "heart_rate": {
+      "value": 110,
+      "unit": "beats/min",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "spo2": {
+      "value": 58,
+      "unit": "%",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "coordination": {
+      "value": "Impaired coordination and ataxia",
+      "unit": "",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "lung_auscultation": {
+      "value": "Crackles and bubbling sounds",
+      "unit": "",
+      "status": "abnormal",
+      "source": "simulation"
+    },
+    "blood_gas": {
+      "value": "67",
+      "unit": "mmHg",
+      "status": "known",
+      "source": "user"
+    }
+  },
+  "completed_triggers": [
+    "ask_ascent_history",
+    "measure_heart_rate",
+    "measure_spo2",
+    "perform_neurologic_exam",
+    "perform_lung_auscultation"
+  ],
+  "working_differential": [
+    {
+      "candidate_id": "ExMCcondition:90",
+      "candidate_name": "Altitude Sickness",
+      "candidate_type": "Condition",
+      "matched_symptoms": [],
+      "matched_context": [
+        "altitude"
+      ],
+      "matched_count": 0,
+      "matched_context_count": 1,
+      "total_symptoms": 7,
+      "match_score": 0.0,
+      "matches_all": false,
+      "graph_score": 50,
+      "provenance": "MAPSTO_CmS symptom or Condition context overlap"
+    },
+    {
+      "candidate_id": "ExMCcondition:136",
+      "candidate_name": "CO2 Headache",
+      "candidate_type": "Condition",
+      "matched_symptoms": [
+        "headache"
+      ],
+      "matched_context": [],
+      "matched_count": 1,
+      "matched_context_count": 0,
+      "total_symptoms": 7,
+      "match_score": 0.14285714285714285,
+      "matches_all": false,
+      "graph_score": 10,
+      "provenance": "MAPSTO_CmS symptom or Condition context overlap"
+    },
+    {
+      "candidate_id": "ExMCcondition:134",
+      "candidate_name": "Headache",
+      "candidate_type": "Condition",
+      "matched_symptoms": [
+        "headache"
+      ],
+      "matched_context": [],
+      "matched_count": 1,
+      "matched_context_count": 0,
+      "total_symptoms": 7,
+      "match_score": 0.14285714285714285,
+      "matches_all": false,
+      "graph_score": 10,
+      "provenance": "MAPSTO_CmS symptom or Condition context overlap"
+    },
+    {
+      "candidate_id": "ExMCcondition:135",
+      "candidate_name": "Headache (late)",
+      "candidate_type": "Condition",
+      "matched_symptoms": [
+        "headache"
+      ],
+      "matched_context": [],
+      "matched_count": 1,
+      "matched_context_count": 0,
+      "total_symptoms": 7,
+      "match_score": 0.14285714285714285,
+      "matches_all": false,
+      "graph_score": 10,
+      "provenance": "MAPSTO_CmS symptom or Condition context overlap"
+    }
+  ],
   "working_diagnosis": null,
   "available_actions": [],
   "completed_actions": [],
-  "reassessment_count": 0
+  "reassessment_count": 0,
+  "last_guidance": {
+    "status": "needs_more_information",
+    "query_findings": [
+      "ataxia",
+      "crackles",
+      "dizziness",
+      "headache",
+      "hypoxia",
+      "pulmonary crackles",
+      "tachycardia"
+    ],
+    "query_context": [
+      "altitude",
+      "evacuation",
+      "mountain"
+    ],
+    "candidate_count": 4,
+    "needs_more_information": true,
+    "recommended_next_step": {
+      "action": "collect_more_information",
+      "reason": "The graph-supported differential remains broad."
+    }
+  }
 }

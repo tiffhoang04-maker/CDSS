@@ -144,6 +144,7 @@ def record_guidance_result(guidance_result: dict[str, Any]) -> dict[str, Any]:
     state["last_guidance"] = {
         "status": guidance_result.get("status"),
         "query_findings": guidance_result.get("query_findings", []),
+        "query_context": guidance_result.get("query_context", []),
         "candidate_count": guidance_result.get("candidate_count", 0),
         "needs_more_information": guidance_result.get(
             "needs_more_information", False

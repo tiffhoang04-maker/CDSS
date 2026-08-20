@@ -13,7 +13,7 @@ from ollama_agent import MAX_TOOL_ROUNDS, SYSTEM_PROMPT, run_agent_turn
 
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gpt-oss:20b")
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
 
 

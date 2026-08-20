@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 from typing import Any
 from .clinical_knowledge_repo import ClinicalKnowledgeRepo
 
@@ -24,7 +25,38 @@ OBSERVATION_TO_KG_TERMS: dict[str, list[str]] = {
     "lung_auscultation": [
         "pulmonary crackles",
         "crackles"
-    ]
+    ],
+    "gastrointestinal_symptoms": [
+        "nausea",
+        "vomiting",
+    ],
+    "temperature": ["fever"],
+    "heart_rate": ["tachycardia"],
+}
+
+PRESENTING_FINDING_TERMS: dict[str, str] = {
+    "abdominal pain": "abdominal pain",
+    "dizziness": "dizziness",
+    "headache": "headache",
+    "loss of appetite": "loss of appetite",
+    "nausea": "nausea",
+    "shortness of breath": "dyspnea",
+    "vomiting": "vomiting",
+}
+
+CONTEXT_STOP_WORDS = {
+    "care",
+    "clinic",
+    "context",
+    "current",
+    "delayed",
+    "environment",
+    "expedition",
+    "field",
+    "limited",
+    "remote",
+    "setting",
+    "supplies",
 }
 
 class ClinicalGuidanceService:
@@ -63,21 +95,62 @@ class ClinicalGuidanceService:
 
         return sorted(terms)
 
+    def extract_presenting_terms(
+        self,
+        public_scenario: dict[str, Any],
+    ) -> list[str]:
+        presenting = public_scenario.get("presenting_information", {})
+        presenting_text = " ".join(
+            str(value).lower()
+            for value in presenting.values()
+        )
+
+        return sorted({
+            graph_term
+            for phrase, graph_term in PRESENTING_FINDING_TERMS.items()
+            if phrase in presenting_text
+        })
+
+    def extract_context_terms(
+        self,
+        public_scenario: dict[str, Any],
+    ) -> list[str]:
+        setting = public_scenario.get("setting", {})
+        context_parts: list[str] = []
+
+        for key, value in setting.items():
+            context_parts.append(str(key).replace("_", " "))
+            if isinstance(value, str):
+                context_parts.append(value)
+
+        tokens = re.findall(
+            r"[a-z][a-z-]{3,}",
+            " ".join(context_parts).lower(),
+        )
+        return sorted({
+            token
+            for token in tokens
+            if token not in CONTEXT_STOP_WORDS
+        })
+
     def build_differential(
         self,
         patient_state: dict[str, Any],
         public_scenario: dict[str, Any]
     ) -> dict[str, Any]:
-        symptom_terms = self.extract_abnormal_terms(
-            patient_state
-        )
+        symptom_terms = sorted({
+            *self.extract_abnormal_terms(patient_state),
+            *self.extract_presenting_terms(public_scenario),
+        })
+        context_terms = self.extract_context_terms(public_scenario)
 
-        if not symptom_terms:
+        if not symptom_terms and not context_terms:
             return {
                 "success": True,
                 "task": "differential",
                 "status": "insufficient_information",
                 "query_findings": [],
+                "query_context": [],
                 "candidate_count": 0,
                # "shortlist_count": 0,
                 "needs_more_information": True,
@@ -99,7 +172,8 @@ class ClinicalGuidanceService:
         candidates = (
             self.repository
             .find_differential_candidates(
-                symptom_terms=symptom_terms
+                symptom_terms=symptom_terms,
+                context_terms=context_terms,
             )
         )
 
@@ -137,9 +211,10 @@ class ClinicalGuidanceService:
             recommended_next_step = {
                 "action": "collect_more_information",
                 "reason": (
-                "The current findings did not match any "
-                "diseases in the knowledge graph."
-            ),
+                    "The current findings did not match any "
+                    "Disease or Condition candidates in the "
+                    "knowledge graph."
+                ),
         }
         elif needs_more_information:
             recommended_next_step = {
@@ -163,6 +238,7 @@ class ClinicalGuidanceService:
             "task": "differential",
             "status": status,
             "query_findings": symptom_terms,
+            "query_context": context_terms,
             "candidate_count": candidate_count,
             "needs_more_information": needs_more_information,
             "candidates": candidates,
